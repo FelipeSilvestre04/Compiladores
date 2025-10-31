@@ -79,9 +79,58 @@ extern int yylineno;
 extern char* yytext;
 extern FILE *yyin;
 
+typedef enum {
+    NODE_PROGRAMA,
+    NODE_VAR_DECLARACAO,
+    NODE_VAR_DECLARACAO_ARRAY,
+    NODE_TIPO_INT,
+    NODE_TIPO_VOID,
+    NODE_FUN_DECLARACAO,
+    NODE_PARAM,
+    NODE_PARAM_ARRAY,
+    NODE_COMPOSTO_DECL,
+    NODE_SELECAO_DECL,
+    NODE_ITERACAO_DECL,
+    NODE_RETORNO_DECL,
+    NODE_EXPRESSAO_REC,
+    NODE_VAR_ARRAY,
+    NODE_RELACIONAL,
+    NODE_REL_LEQUAL,
+    NODE_REL_MENOR,
+    NODE_REL_HIGHER,
+    NODE_REL_HEQUAL,
+    NODE_REL_IGL,
+    NODE_REL_DIF,
+    NODE_SOMA,
+    NODE_SUB,
+    NODE_MULT,
+    NODE_DIV,
+    NODE_ATIVACAO,
+    NODE_ID,
+    NODE_NUM
+} NodeType;
+
+typedef struct Node {
+    NodeType type;
+    int ival;
+    char* sval;
+    struct Node* child1;
+    struct Node* child2;
+    struct Node* child3;
+    struct Node* sibling;
+} Node;
+
+Node* create_node(NodeType type, Node* c1, Node* c2, Node* c3);
+Node* create_leaf_val(NodeType type, int ival);
+Node* create_leaf_id(NodeType type, char* sval);
+void print_tree(Node* node, int indent);
+
+Node* ast_root = NULL;
+
+
 
 /* Line 189 of yacc.c  */
-#line 85 "parser.tab.c"
+#line 134 "parser.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -145,15 +194,16 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 13 "parser.y"
+#line 62 "parser.y"
 
     int ival;
     char* sval; 
+    struct Node* nptr;
 
 
 
 /* Line 214 of yacc.c  */
-#line 157 "parser.tab.c"
+#line 207 "parser.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -165,7 +215,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 169 "parser.tab.c"
+#line 219 "parser.tab.c"
 
 #ifdef short
 # undef short
@@ -471,15 +521,15 @@ static const yytype_int8 yyrhs[] =
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,    40,    40,    44,    45,    49,    50,    54,    55,    59,
-      60,    64,    68,    69,    73,    74,    78,    79,    83,    87,
-      88,    92,    93,    97,    98,    99,   100,   101,   105,   106,
-     110,   111,   115,   119,   120,   124,   125,   129,   130,   134,
-     135,   139,   139,   139,   139,   139,   139,   143,   144,   148,
-     148,   152,   153,   157,   157,   161,   162,   163,   164,   168,
-     172,   173,   177,   178
+       0,    97,    97,   104,   114,   118,   119,   123,   126,   132,
+     133,   137,   145,   146,   150,   156,   160,   163,   169,   175,
+     185,   189,   199,   203,   204,   205,   206,   207,   211,   212,
+     216,   219,   225,   231,   234,   240,   243,   247,   248,   254,
+     257,   261,   262,   263,   264,   265,   266,   270,   273,   277,
+     278,   282,   285,   289,   290,   294,   295,   296,   297,   301,
+     307,   308,   312,   318
 };
 #endif
 
@@ -1455,10 +1505,520 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-      
+        case 2:
 
 /* Line 1464 of yacc.c  */
-#line 1462 "parser.tab.c"
+#line 97 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_PROGRAMA, (yyvsp[(1) - (1)].nptr), NULL, NULL); 
+        ast_root = (yyval.nptr);
+    ;}
+    break;
+
+  case 3:
+
+/* Line 1464 of yacc.c  */
+#line 104 "parser.y"
+    {
+        Node* head = (yyvsp[(1) - (2)].nptr);
+        if (head) {
+            while (head->sibling) head = head->sibling;
+            head->sibling = (yyvsp[(2) - (2)].nptr);
+            (yyval.nptr) = (yyvsp[(1) - (2)].nptr);
+        } else {
+            (yyval.nptr) = (yyvsp[(2) - (2)].nptr);
+        }
+    ;}
+    break;
+
+  case 4:
+
+/* Line 1464 of yacc.c  */
+#line 114 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 5:
+
+/* Line 1464 of yacc.c  */
+#line 118 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 6:
+
+/* Line 1464 of yacc.c  */
+#line 119 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 7:
+
+/* Line 1464 of yacc.c  */
+#line 123 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_VAR_DECLARACAO, (yyvsp[(1) - (3)].nptr), create_leaf_id(NODE_ID, (yyvsp[(2) - (3)].sval)), NULL); 
+    ;}
+    break;
+
+  case 8:
+
+/* Line 1464 of yacc.c  */
+#line 126 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_VAR_DECLARACAO_ARRAY, (yyvsp[(1) - (6)].nptr), create_leaf_id(NODE_ID, (yyvsp[(2) - (6)].sval)), create_leaf_val(NODE_NUM, (yyvsp[(4) - (6)].ival))); 
+    ;}
+    break;
+
+  case 9:
+
+/* Line 1464 of yacc.c  */
+#line 132 "parser.y"
+    { (yyval.nptr) = create_node(NODE_TIPO_INT, NULL, NULL, NULL); ;}
+    break;
+
+  case 10:
+
+/* Line 1464 of yacc.c  */
+#line 133 "parser.y"
+    { (yyval.nptr) = create_node(NODE_TIPO_VOID, NULL, NULL, NULL); ;}
+    break;
+
+  case 11:
+
+/* Line 1464 of yacc.c  */
+#line 137 "parser.y"
+    {
+        Node* id_node = create_leaf_id(NODE_ID, (yyvsp[(2) - (6)].sval));
+        id_node->child1 = (yyvsp[(4) - (6)].nptr);
+        (yyval.nptr) = create_node(NODE_FUN_DECLARACAO, (yyvsp[(1) - (6)].nptr), id_node, (yyvsp[(6) - (6)].nptr));
+    ;}
+    break;
+
+  case 12:
+
+/* Line 1464 of yacc.c  */
+#line 145 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 13:
+
+/* Line 1464 of yacc.c  */
+#line 146 "parser.y"
+    { (yyval.nptr) = create_node(NODE_TIPO_VOID, NULL, NULL, NULL); ;}
+    break;
+
+  case 14:
+
+/* Line 1464 of yacc.c  */
+#line 150 "parser.y"
+    {
+        Node* head = (yyvsp[(1) - (3)].nptr);
+        while (head->sibling) head = head->sibling;
+        head->sibling = (yyvsp[(3) - (3)].nptr);
+        (yyval.nptr) = (yyvsp[(1) - (3)].nptr);
+    ;}
+    break;
+
+  case 15:
+
+/* Line 1464 of yacc.c  */
+#line 156 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 16:
+
+/* Line 1464 of yacc.c  */
+#line 160 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_PARAM, (yyvsp[(1) - (2)].nptr), create_leaf_id(NODE_ID, (yyvsp[(2) - (2)].sval)), NULL); 
+    ;}
+    break;
+
+  case 17:
+
+/* Line 1464 of yacc.c  */
+#line 163 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_PARAM_ARRAY, (yyvsp[(1) - (4)].nptr), create_leaf_id(NODE_ID, (yyvsp[(2) - (4)].sval)), NULL); 
+    ;}
+    break;
+
+  case 18:
+
+/* Line 1464 of yacc.c  */
+#line 169 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_COMPOSTO_DECL, (yyvsp[(2) - (4)].nptr), (yyvsp[(3) - (4)].nptr), NULL); 
+    ;}
+    break;
+
+  case 19:
+
+/* Line 1464 of yacc.c  */
+#line 175 "parser.y"
+    {
+        Node* head = (yyvsp[(1) - (2)].nptr);
+        if (head) {
+            while (head->sibling) head = head->sibling;
+            head->sibling = (yyvsp[(2) - (2)].nptr);
+            (yyval.nptr) = (yyvsp[(1) - (2)].nptr);
+        } else {
+            (yyval.nptr) = (yyvsp[(2) - (2)].nptr);
+        }
+    ;}
+    break;
+
+  case 20:
+
+/* Line 1464 of yacc.c  */
+#line 185 "parser.y"
+    { (yyval.nptr) = NULL; ;}
+    break;
+
+  case 21:
+
+/* Line 1464 of yacc.c  */
+#line 189 "parser.y"
+    {
+        Node* head = (yyvsp[(1) - (2)].nptr);
+        if (head) {
+            while (head->sibling) head = head->sibling;
+            head->sibling = (yyvsp[(2) - (2)].nptr);
+            (yyval.nptr) = (yyvsp[(1) - (2)].nptr);
+        } else {
+            (yyval.nptr) = (yyvsp[(2) - (2)].nptr);
+        }
+    ;}
+    break;
+
+  case 22:
+
+/* Line 1464 of yacc.c  */
+#line 199 "parser.y"
+    { (yyval.nptr) = NULL; ;}
+    break;
+
+  case 23:
+
+/* Line 1464 of yacc.c  */
+#line 203 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 24:
+
+/* Line 1464 of yacc.c  */
+#line 204 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 25:
+
+/* Line 1464 of yacc.c  */
+#line 205 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 26:
+
+/* Line 1464 of yacc.c  */
+#line 206 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 27:
+
+/* Line 1464 of yacc.c  */
+#line 207 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 28:
+
+/* Line 1464 of yacc.c  */
+#line 211 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (2)].nptr); ;}
+    break;
+
+  case 29:
+
+/* Line 1464 of yacc.c  */
+#line 212 "parser.y"
+    { (yyval.nptr) = NULL; ;}
+    break;
+
+  case 30:
+
+/* Line 1464 of yacc.c  */
+#line 216 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_SELECAO_DECL, (yyvsp[(3) - (5)].nptr), (yyvsp[(5) - (5)].nptr), NULL); 
+    ;}
+    break;
+
+  case 31:
+
+/* Line 1464 of yacc.c  */
+#line 219 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_SELECAO_DECL, (yyvsp[(3) - (7)].nptr), (yyvsp[(5) - (7)].nptr), (yyvsp[(7) - (7)].nptr)); 
+    ;}
+    break;
+
+  case 32:
+
+/* Line 1464 of yacc.c  */
+#line 225 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_ITERACAO_DECL, (yyvsp[(3) - (5)].nptr), (yyvsp[(5) - (5)].nptr), NULL); 
+    ;}
+    break;
+
+  case 33:
+
+/* Line 1464 of yacc.c  */
+#line 231 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_RETORNO_DECL, NULL, NULL, NULL); 
+    ;}
+    break;
+
+  case 34:
+
+/* Line 1464 of yacc.c  */
+#line 234 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_RETORNO_DECL, (yyvsp[(2) - (3)].nptr), NULL, NULL); 
+    ;}
+    break;
+
+  case 35:
+
+/* Line 1464 of yacc.c  */
+#line 240 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_EXPRESSAO_REC, (yyvsp[(1) - (3)].nptr), (yyvsp[(3) - (3)].nptr), NULL); 
+    ;}
+    break;
+
+  case 36:
+
+/* Line 1464 of yacc.c  */
+#line 243 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 37:
+
+/* Line 1464 of yacc.c  */
+#line 247 "parser.y"
+    { (yyval.nptr) = create_leaf_id(NODE_ID, (yyvsp[(1) - (1)].sval)); ;}
+    break;
+
+  case 38:
+
+/* Line 1464 of yacc.c  */
+#line 248 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_VAR_ARRAY, create_leaf_id(NODE_ID, (yyvsp[(1) - (4)].sval)), (yyvsp[(3) - (4)].nptr), NULL); 
+    ;}
+    break;
+
+  case 39:
+
+/* Line 1464 of yacc.c  */
+#line 254 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_RELACIONAL, (yyvsp[(1) - (3)].nptr), (yyvsp[(3) - (3)].nptr), (yyvsp[(2) - (3)].nptr)); 
+    ;}
+    break;
+
+  case 40:
+
+/* Line 1464 of yacc.c  */
+#line 257 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 41:
+
+/* Line 1464 of yacc.c  */
+#line 261 "parser.y"
+    { (yyval.nptr) = create_node(NODE_REL_LEQUAL, NULL, NULL, NULL); ;}
+    break;
+
+  case 42:
+
+/* Line 1464 of yacc.c  */
+#line 262 "parser.y"
+    { (yyval.nptr) = create_node(NODE_REL_MENOR, NULL, NULL, NULL); ;}
+    break;
+
+  case 43:
+
+/* Line 1464 of yacc.c  */
+#line 263 "parser.y"
+    { (yyval.nptr) = create_node(NODE_REL_HIGHER, NULL, NULL, NULL); ;}
+    break;
+
+  case 44:
+
+/* Line 1464 of yacc.c  */
+#line 264 "parser.y"
+    { (yyval.nptr) = create_node(NODE_REL_HEQUAL, NULL, NULL, NULL); ;}
+    break;
+
+  case 45:
+
+/* Line 1464 of yacc.c  */
+#line 265 "parser.y"
+    { (yyval.nptr) = create_node(NODE_REL_IGL, NULL, NULL, NULL); ;}
+    break;
+
+  case 46:
+
+/* Line 1464 of yacc.c  */
+#line 266 "parser.y"
+    { (yyval.nptr) = create_node(NODE_REL_DIF, NULL, NULL, NULL); ;}
+    break;
+
+  case 47:
+
+/* Line 1464 of yacc.c  */
+#line 270 "parser.y"
+    { 
+        (yyval.nptr) = create_node((yyvsp[(2) - (3)].nptr)->type, (yyvsp[(1) - (3)].nptr), (yyvsp[(3) - (3)].nptr), NULL); 
+    ;}
+    break;
+
+  case 48:
+
+/* Line 1464 of yacc.c  */
+#line 273 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 49:
+
+/* Line 1464 of yacc.c  */
+#line 277 "parser.y"
+    { (yyval.nptr) = create_node(NODE_SOMA, NULL, NULL, NULL); ;}
+    break;
+
+  case 50:
+
+/* Line 1464 of yacc.c  */
+#line 278 "parser.y"
+    { (yyval.nptr) = create_node(NODE_SUB, NULL, NULL, NULL); ;}
+    break;
+
+  case 51:
+
+/* Line 1464 of yacc.c  */
+#line 282 "parser.y"
+    { 
+        (yyval.nptr) = create_node((yyvsp[(2) - (3)].nptr)->type, (yyvsp[(1) - (3)].nptr), (yyvsp[(3) - (3)].nptr), NULL); 
+    ;}
+    break;
+
+  case 52:
+
+/* Line 1464 of yacc.c  */
+#line 285 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 53:
+
+/* Line 1464 of yacc.c  */
+#line 289 "parser.y"
+    { (yyval.nptr) = create_node(NODE_MULT, NULL, NULL, NULL); ;}
+    break;
+
+  case 54:
+
+/* Line 1464 of yacc.c  */
+#line 290 "parser.y"
+    { (yyval.nptr) = create_node(NODE_DIV, NULL, NULL, NULL); ;}
+    break;
+
+  case 55:
+
+/* Line 1464 of yacc.c  */
+#line 294 "parser.y"
+    { (yyval.nptr) = (yyvsp[(2) - (3)].nptr); ;}
+    break;
+
+  case 56:
+
+/* Line 1464 of yacc.c  */
+#line 295 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 57:
+
+/* Line 1464 of yacc.c  */
+#line 296 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 58:
+
+/* Line 1464 of yacc.c  */
+#line 297 "parser.y"
+    { (yyval.nptr) = create_leaf_val(NODE_NUM, (yyvsp[(1) - (1)].ival)); ;}
+    break;
+
+  case 59:
+
+/* Line 1464 of yacc.c  */
+#line 301 "parser.y"
+    { 
+        (yyval.nptr) = create_node(NODE_ATIVACAO, create_leaf_id(NODE_ID, (yyvsp[(1) - (4)].sval)), (yyvsp[(3) - (4)].nptr), NULL); 
+    ;}
+    break;
+
+  case 60:
+
+/* Line 1464 of yacc.c  */
+#line 307 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+  case 61:
+
+/* Line 1464 of yacc.c  */
+#line 308 "parser.y"
+    { (yyval.nptr) = NULL; ;}
+    break;
+
+  case 62:
+
+/* Line 1464 of yacc.c  */
+#line 312 "parser.y"
+    {
+        Node* head = (yyvsp[(1) - (3)].nptr);
+        while (head->sibling) head = head->sibling;
+        head->sibling = (yyvsp[(3) - (3)].nptr);
+        (yyval.nptr) = (yyvsp[(1) - (3)].nptr);
+    ;}
+    break;
+
+  case 63:
+
+/* Line 1464 of yacc.c  */
+#line 318 "parser.y"
+    { (yyval.nptr) = (yyvsp[(1) - (1)].nptr); ;}
+    break;
+
+
+
+/* Line 1464 of yacc.c  */
+#line 2022 "parser.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1670,27 +2230,102 @@ yyreturn:
 
 
 /* Line 1684 of yacc.c  */
-#line 181 "parser.y"
+#line 320 "parser.y"
 
+
+Node* create_node(NodeType type, Node* c1, Node* c2, Node* c3) {
+    Node* n = (Node*) malloc(sizeof(Node));
+    if (n == NULL) {
+        yyerror("Erro: Sem memória para criar nó da árvore");
+        exit(1);
+    }
+    n->type = type;
+    n->ival = 0;
+    n->sval = NULL;
+    n->child1 = c1;
+    n->child2 = c2;
+    n->child3 = c3;
+    n->sibling = NULL;
+    return n;
+}
+
+Node* create_leaf_val(NodeType type, int ival) {
+    Node* n = create_node(type, NULL, NULL, NULL);
+    n->ival = ival;
+    return n;
+}
+
+Node* create_leaf_id(NodeType type, char* sval) {
+    Node* n = create_node(type, NULL, NULL, NULL);
+    n->sval = strdup(sval); 
+    return n;
+}
+
+void print_tree(Node* node, int indent) {
+    if (node == NULL) {
+        return;
+    }
+
+    for(int i = 0; i < indent; i++) {
+        printf("  ");
+    }
+
+    switch(node->type) {
+        case NODE_PROGRAMA: printf("PROGRAMA\n"); break;
+        case NODE_VAR_DECLARACAO: printf("VAR_DECLARACAO\n"); break;
+        case NODE_VAR_DECLARACAO_ARRAY: printf("VAR_DECLARACAO_ARRAY\n"); break;
+        case NODE_TIPO_INT: printf("TIPO: INT\n"); break;
+        case NODE_TIPO_VOID: printf("TIPO: VOID\n"); break;
+        case NODE_FUN_DECLARACAO: printf("FUN_DECLARACAO\n"); break;
+        case NODE_PARAM: printf("PARAM\n"); break;
+        case NODE_PARAM_ARRAY: printf("PARAM_ARRAY\n"); break;
+        case NODE_COMPOSTO_DECL: printf("COMPOSTO_DECL\n"); break;
+        case NODE_SELECAO_DECL: printf("SELECAO_DECL (IF)\n"); break;
+        case NODE_ITERACAO_DECL: printf("ITERACAO_DECL (WHILE)\n"); break;
+        case NODE_RETORNO_DECL: printf("RETORNO_DECL\n"); break;
+        case NODE_EXPRESSAO_REC: printf("ATRIBUICAO (=)\n"); break;
+        case NODE_VAR_ARRAY: printf("VAR_ARRAY (acesso)\n"); break;
+        case NODE_RELACIONAL: printf("RELACIONAL\n"); break;
+        case NODE_REL_LEQUAL: printf("RELACIONAL (<=)\n"); break;
+        case NODE_REL_MENOR: printf("RELACIONAL (<)\n"); break;
+        case NODE_REL_HIGHER: printf("RELACIONAL (>)\n"); break;
+        case NODE_REL_HEQUAL: printf("RELACIONAL (>=)\n"); break;
+        case NODE_REL_IGL: printf("RELACIONAL (==)\n"); break;
+        case NODE_REL_DIF: printf("RELACIONAL (!=)\n"); break;
+        case NODE_SOMA: printf("OPERADOR (+)\n"); break;
+        case NODE_SUB: printf("OPERADOR (-)\n"); break;
+        case NODE_MULT: printf("OPERADOR (*)\n"); break;
+        case NODE_DIV: printf("OPERADOR (/)\n"); break;
+        case NODE_ATIVACAO: printf("ATIVACAO (call)\n"); break;
+        case NODE_ID: printf("ID (%s)\n", node->sval); break;
+        case NODE_NUM: printf("NUM (%d)\n", node->ival); break;
+        default: printf("ERRO: Nó desconhecido (%d)\n", node->type);
+    }
+
+    print_tree(node->child1, indent + 1);
+    print_tree(node->child2, indent + 1);
+    print_tree(node->child3, indent + 1);
+    print_tree(node->sibling, indent);
+}
 
 int main(int argc, char *argv[]) {
     FILE *f_in;
-
     if (argc == 2) {
         if ( !(f_in = fopen(argv[1], "r")) ) {
             perror(argv[1]);
             return 1;
         }
-        yyin = f_in; 
+        yyin = f_in;
     } else {
         printf("Uso: ./meu_parser <arquivo_de_entrada>\n");
         return 1;
     }
 
     printf("Iniciando analise sintatica de: %s\n", argv[1]);
-
     if (yyparse() == 0) { 
         printf("Analise Sintatica concluida com SUCESSO!\n");
+        printf("\nImprimindo Arvore Sintatica Abstrata:\n");
+        print_tree(ast_root, 0);
     } else {
         printf("Analise Sintatica falhou.\n");
     }

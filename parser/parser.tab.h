@@ -75,15 +75,16 @@ typedef union YYSTYPE
 {
 
 /* Line 1685 of yacc.c  */
-#line 13 "parser.y"
+#line 62 "parser.y"
 
     int ival;
     char* sval; 
+    struct Node* nptr;
 
 
 
 /* Line 1685 of yacc.c  */
-#line 87 "parser.tab.h"
+#line 88 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
