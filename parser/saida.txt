@@ -1,0 +1,187 @@
+Iniciando analise sintatica de: ..\sort.txt
+Analise Sintatica concluida com SUCESSO!
+
+Imprimindo Arvore Sintatica Abstrata:
+PROGRAMA
+  VAR_DECLARACAO_ARRAY
+    TIPO: INT
+    ID (vet)
+    NUM (10)
+  FUN_DECLARACAO
+    TIPO: INT
+    ID (minloc)
+      PARAM_ARRAY
+        TIPO: INT
+        ID (a)
+      PARAM
+        TIPO: INT
+        ID (low)
+      PARAM
+        TIPO: INT
+        ID (high)
+    COMPOSTO_DECL
+      VAR_DECLARACAO
+        TIPO: INT
+        ID (i)
+      VAR_DECLARACAO
+        TIPO: INT
+        ID (x)
+      VAR_DECLARACAO
+        TIPO: INT
+        ID (k)
+      ATRIBUICAO (=)
+        ID (k)
+        ID (low)
+      ATRIBUICAO (=)
+        ID (x)
+        VAR_ARRAY (acesso)
+          ID (a)
+          ID (low)
+      ATRIBUICAO (=)
+        ID (i)
+        OPERADOR (+)
+          ID (low)
+          NUM (1)
+      ITERACAO_DECL (WHILE)
+        RELACIONAL
+          ID (i)
+          ID (high)
+          RELACIONAL (<)
+        COMPOSTO_DECL
+          SELECAO_DECL (IF)
+            RELACIONAL
+              VAR_ARRAY (acesso)
+                ID (a)
+                ID (i)
+              ID (x)
+              RELACIONAL (<)
+            COMPOSTO_DECL
+              ATRIBUICAO (=)
+                ID (x)
+                VAR_ARRAY (acesso)
+                  ID (a)
+                  ID (i)
+              ATRIBUICAO (=)
+                ID (k)
+                ID (i)
+          ATRIBUICAO (=)
+            ID (i)
+            OPERADOR (+)
+              ID (i)
+              NUM (1)
+      RETORNO_DECL
+        ID (k)
+  FUN_DECLARACAO
+    TIPO: VOID
+    ID (sort)
+      PARAM_ARRAY
+        TIPO: INT
+        ID (a)
+      PARAM
+        TIPO: INT
+        ID (low)
+      PARAM
+        TIPO: INT
+        ID (high)
+    COMPOSTO_DECL
+      VAR_DECLARACAO
+        TIPO: INT
+        ID (i)
+      VAR_DECLARACAO
+        TIPO: INT
+        ID (k)
+      ATRIBUICAO (=)
+        ID (i)
+        ID (low)
+      ITERACAO_DECL (WHILE)
+        RELACIONAL
+          ID (i)
+          OPERADOR (-)
+            ID (high)
+            NUM (1)
+          RELACIONAL (<)
+        COMPOSTO_DECL
+          VAR_DECLARACAO
+            TIPO: INT
+            ID (t)
+          ATRIBUICAO (=)
+            ID (k)
+            ATIVACAO (call)
+              ID (minloc)
+              ID (a)
+              ID (i)
+              ID (high)
+          ATRIBUICAO (=)
+            ID (t)
+            VAR_ARRAY (acesso)
+              ID (a)
+              ID (k)
+          ATRIBUICAO (=)
+            VAR_ARRAY (acesso)
+              ID (a)
+              ID (k)
+            VAR_ARRAY (acesso)
+              ID (a)
+              ID (i)
+          ATRIBUICAO (=)
+            VAR_ARRAY (acesso)
+              ID (a)
+              ID (i)
+            ID (t)
+          ATRIBUICAO (=)
+            ID (i)
+            OPERADOR (+)
+              ID (i)
+              NUM (1)
+  FUN_DECLARACAO
+    TIPO: VOID
+    ID (main)
+      TIPO: VOID
+    COMPOSTO_DECL
+      VAR_DECLARACAO
+        TIPO: INT
+        ID (i)
+      ATRIBUICAO (=)
+        ID (i)
+        NUM (0)
+      ITERACAO_DECL (WHILE)
+        RELACIONAL
+          ID (i)
+          NUM (10)
+          RELACIONAL (<)
+        COMPOSTO_DECL
+          ATRIBUICAO (=)
+            VAR_ARRAY (acesso)
+              ID (vet)
+              ID (i)
+            ATIVACAO (call)
+              ID (input)
+          ATRIBUICAO (=)
+            ID (i)
+            OPERADOR (+)
+              ID (i)
+              NUM (1)
+      ATIVACAO (call)
+        ID (sort)
+        ID (vet)
+        NUM (0)
+        NUM (10)
+      ATRIBUICAO (=)
+        ID (i)
+        NUM (0)
+      ITERACAO_DECL (WHILE)
+        RELACIONAL
+          ID (i)
+          NUM (10)
+          RELACIONAL (<)
+        COMPOSTO_DECL
+          ATIVACAO (call)
+            ID (output)
+            VAR_ARRAY (acesso)
+              ID (vet)
+              ID (i)
+          ATRIBUICAO (=)
+            ID (i)
+            OPERADOR (+)
+              ID (i)
+              NUM (1)
