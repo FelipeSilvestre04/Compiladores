@@ -41,45 +41,49 @@
 DIGITO [0-9]
 LETRA [a-zA-Z]
 OUTRO [^0-9a-zA-Z;/=\-"+*()<>!\[\],{} \t\n]
-// para comentarios "/*"([^*]|\*+[^*/])*\*+"/" 
+COMENTARIO_BLOCO "/*"([^*]|\*+[^*/])*\*+"/"
 %%
-\t			return TAB;
-\n 			return BRL;
-[ ]+			return ESP;
-if return IF;
-int return INT;
-else return ELSE;
-return return RET;
-void return VOI;
-while return WHI;
-"<=" return LEQUAL;
-">=" return HEQUAL;
-"==" return IGL;
-"!=" return DIF;
-"<"  return MINOR;
-">"  return HIGHER;
-"="  return REC;
-"+"  return SOM;
-"-"  return SUB;
-"*"  return MUL;
-"/"  return DIV;
-";"  return PEV;
-","  return VIR;
-"("  return APR;
-")"  return FPR;
-"["  return ACO;
-"]"  return FCO;
-"{"  return ACH;
-"}"  return FCH;
-<<EOF>> return FIM;
-{DIGITO}+                return NUM;
-{LETRA}+		 return ID;
-{OUTRO}+                 return ERR;
+\t			{ return TAB; }
+\n 			{ return BRL; }
+[ ]+			{ return ESP; }
+
+{COMENTARIO_BLOCO} { /* Ignora */ }
+
+if { return IF; }
+int { return INT; }
+else { return ELSE; }
+return { return RET; }
+void { return VOI; }
+while { return WHI; }
+"<=" { return LEQUAL; }
+">=" { return HEQUAL; }
+"==" { return IGL; }
+"!=" { return DIF; }
+"<"  { return MINOR; }
+">"  { return HIGHER; }
+"="  { return REC; }
+"+"  { return SOM; }
+"-"  { return SUB; }
+"*"  { return MUL; }
+"/"  { return DIV; }
+";"  { return PEV; }
+","  { return VIR; }
+"("  { return APR; }
+")"  { return FPR; }
+"["  { return ACO; }
+"]"  { return FCO; }
+"{"  { return ACH; }
+"}"  { return FCH; }
+<<EOF>> { return FIM; }
+
+{DIGITO}+                { return NUM; }
+{LETRA}({LETRA}|{DIGITO})* { return ID; }
+{OUTRO}+                 { return ERR; }
 %%
 
 int main(int argc, char *argv[])
 {
-    int token, i, buf[100];
+    int token, i, buf[10000];
     FILE *f_in;
 
     for (i=0; i<=99; i++) buf[i] = 0;
@@ -148,3 +152,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+
+int yywrap() {
+    return 1; 
+}
