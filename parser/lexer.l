@@ -61,8 +61,7 @@ COMENTARIO_BLOCO "/*"([^*]|\*+[^*/])*\*+"/"
 }
 
 . { 
-    fprintf(stderr, "ERRO LEXICO: Caractere invalido '%s' na linha %d\n", 
-            yytext, yylineno);
+    printf("ERRO LÉXICO: %s LINHA: %d\n", yytext, yylineno);
 }
 
 <<EOF>> { return 0; } 

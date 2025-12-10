@@ -48,12 +48,14 @@ typedef struct Node {
     struct Node* child2;
     struct Node* child3;
     struct Node* sibling;
+    int lineno;
 } Node;
 
 Node* create_node(NodeType type, Node* c1, Node* c2, Node* c3);
 Node* create_leaf_val(NodeType type, int ival);
 Node* create_leaf_id(NodeType type, char* sval);
 void print_tree(Node* node, int indent);
+void semantic_analysis(Node* root);
 
 Node* ast_root = NULL;
 
@@ -87,7 +89,8 @@ Node* ast_root = NULL;
 %left SOM SUB
 %left MUL DIV
 %right REC
-%nonassoc ELSE 
+%nonassoc LOWER_THAN_ELSE
+%nonassoc ELSE
 
 %start programa
 
@@ -213,7 +216,7 @@ expressao_decl:
     ;
 
 selecao_decl:
-    IF APR expressao FPR statement { 
+    IF APR expressao FPR statement %prec LOWER_THAN_ELSE { 
         $$ = create_node(NODE_SELECAO_DECL, $3, $5, NULL); 
     }
     | IF APR expressao FPR statement ELSE statement { 
@@ -332,6 +335,7 @@ Node* create_node(NodeType type, Node* c1, Node* c2, Node* c3) {
     n->child2 = c2;
     n->child3 = c3;
     n->sibling = NULL;
+    n->lineno = yylineno;
     return n;
 }
 
@@ -412,6 +416,9 @@ int main(int argc, char *argv[]) {
         printf("Analise Sintatica concluida com SUCESSO!\n");
         printf("\nImprimindo Arvore Sintatica Abstrata:\n");
         print_tree(ast_root, 0);
+        
+        printf("\nIniciando Analise Semantica...\n");
+        semantic_analysis(ast_root);
     } else {
         printf("Analise Sintatica falhou.\n");
     }
@@ -421,6 +428,338 @@ int main(int argc, char *argv[]) {
 }
 
 void yyerror(const char *s) {
-    fprintf(stderr, "ERRO SINTATICO: %s na linha %d. Token lido: '%s'\n", 
-            s, yylineno, yytext);
+    printf("ERRO SINTÁTICO: %s LINHA: %d\n", yytext, yylineno);
+}
+
+typedef struct Symbol {
+    char* name;
+    char* type; 
+    char* scope; 
+    char* kind; 
+    int lineno;
+    struct Symbol* next;
+    struct Symbol* params; 
+} Symbol;
+
+Symbol* symbol_table = NULL;
+
+void semantic_error(char* msg, char* id, int lineno) {
+    if (id)
+        printf("ERRO SEMÂNTICO: %s %s LINHA: %d\n", msg, id, lineno);
+    else
+        printf("ERRO SEMÂNTICO: %s LINHA: %d\n", msg, lineno);
+}
+
+Symbol* create_symbol(char* name, char* type, char* scope, char* kind, int lineno) {
+    Symbol* s = (Symbol*) malloc(sizeof(Symbol));
+    s->name = strdup(name);
+    s->type = strdup(type);
+    s->scope = strdup(scope);
+    s->kind = strdup(kind);
+    s->lineno = lineno;
+    s->next = NULL;
+    s->params = NULL;
+    return s;
+}
+
+void insert_symbol(char* name, char* type, char* scope, char* kind, int lineno) {
+    Symbol* s = create_symbol(name, type, scope, kind, lineno);
+    s->next = symbol_table;
+    symbol_table = s;
+}
+
+Symbol* lookup_symbol(char* name, char* scope) {
+    Symbol* s = symbol_table;
+    while (s != NULL) {
+        if (strcmp(s->name, name) == 0) {
+            
+            if (strcmp(s->scope, scope) == 0) {
+                return s;
+            }
+        }
+        s = s->next;
+    }
+    
+    s = symbol_table;
+    while (s != NULL) {
+        if (strcmp(s->name, name) == 0) {
+            if (strcmp(s->scope, "global") == 0) {
+                return s;
+            }
+        }
+        s = s->next;
+    }
+    return NULL;
+}
+
+Symbol* lookup_function(char* name) {
+    Symbol* s = symbol_table;
+    while (s != NULL) {
+        if (strcmp(s->name, name) == 0 && strcmp(s->kind, "fun") == 0) {
+            return s;
+        }
+        s = s->next;
+    }
+    return NULL;
+}
+
+int is_declared_in_scope(char* name, char* scope) {
+    Symbol* s = symbol_table;
+    while (s != NULL) {
+        if (strcmp(s->name, name) == 0 && strcmp(s->scope, scope) == 0) {
+            return 1;
+        }
+        s = s->next;
+    }
+    return 0;
+}
+
+void print_symbol_table() {
+    printf("\nTABELA DE SIMBOLOS:\n");
+    printf("%-20s %-10s %-10s %-10s %-10s\n", "Nome", "Tipo", "Escopo", "Categoria", "Linha");
+    Symbol* s = symbol_table;
+    while (s != NULL) {
+        printf("%-20s %-10s %-10s %-10s %d\n", s->name, s->type, s->scope, s->kind, s->lineno);
+        s = s->next;
+    }
+}
+
+char* get_type_from_node(Node* node) {
+    if (node->type == NODE_TIPO_INT) return "int";
+    if (node->type == NODE_TIPO_VOID) return "void";
+    return "unknown";
+}
+
+char* get_expression_type(Node* node, char* scope) {
+    if (!node) return "void";
+    
+    switch(node->type) {
+        case NODE_NUM: return "int";
+        case NODE_ID: {
+            Symbol* s = lookup_symbol(node->sval, scope);
+            return s ? s->type : "unknown";
+        }
+        case NODE_VAR_ARRAY: {
+             Symbol* s = lookup_symbol(node->child1->sval, scope);
+             return s ? s->type : "unknown";
+        }
+        case NODE_ATIVACAO: {
+            Symbol* s = lookup_function(node->child1->sval);
+            return s ? s->type : "unknown";
+        }
+        case NODE_SOMA:
+        case NODE_SUB:
+        case NODE_MULT:
+        case NODE_DIV:
+            return "int";
+        default:
+            return "int"; 
+    }
+}
+
+void analyze_node(Node* node, char* current_scope) {
+    if (node == NULL) return;
+
+    switch(node->type) {
+        case NODE_PROGRAMA:
+            analyze_node(node->child1, current_scope); 
+            break;
+            
+        case NODE_VAR_DECLARACAO:
+        case NODE_VAR_DECLARACAO_ARRAY: {
+            char* type = get_type_from_node(node->child1);
+            char* name = node->child2->sval;
+            
+            if (strcmp(type, "void") == 0) {
+                semantic_error("declaração inválida de variável", name, node->lineno);
+            } 
+            else if (is_declared_in_scope(name, current_scope)) {
+                semantic_error("declaração inválida de variável", name, node->lineno); 
+            } 
+            else if (lookup_function(name)) {
+                 semantic_error("declaração inválida", name, node->lineno); 
+            } else {
+                insert_symbol(name, type, current_scope, (node->type == NODE_VAR_DECLARACAO_ARRAY) ? "array" : "var", node->lineno);
+            }
+            break;
+        }
+        
+        case NODE_FUN_DECLARACAO: {
+            char* type = get_type_from_node(node->child1);
+            char* name = node->child2->sval;
+            
+            if (lookup_function(name)) {
+                semantic_error("declaração inválida", name, node->lineno);
+            } else {
+                insert_symbol(name, type, "global", "fun", node->lineno);
+                Symbol* fun_sym = symbol_table; 
+                
+                Node* params = node->child2->child1; 
+                Node* param_list = params;
+                
+                if (param_list && param_list->type != NODE_TIPO_VOID) {
+                    Node* p = param_list;
+                    while (p) {
+                        if (p->type == NODE_PARAM || p->type == NODE_PARAM_ARRAY) {
+                            char* p_type = get_type_from_node(p->child1);
+                            char* p_name = p->child2->sval;
+                            
+                            if (strcmp(p_type, "void") == 0) {
+                                semantic_error("declaração inválida de variável", p_name, p->lineno);
+                            } else {
+                                insert_symbol(p_name, p_type, name, "param", p->lineno);
+                                
+                                Symbol* param_sym = create_symbol(p_name, p_type, name, "param", p->lineno);
+                                
+                                if (fun_sym->params == NULL) {
+                                    fun_sym->params = param_sym;
+                                } else {
+                                    Symbol* last = fun_sym->params;
+                                    while (last->next) last = last->next;
+                                    last->next = param_sym;
+                                }
+                            }
+                        }
+                        p = p->sibling;
+                    }
+                }
+            }
+            
+            analyze_node(node->child3, name); 
+            break;
+        }
+        
+        case NODE_COMPOSTO_DECL:
+            analyze_node(node->child1, current_scope); 
+            analyze_node(node->child2, current_scope); 
+            break;
+            
+        case NODE_ATIVACAO: {
+            char* func_name = node->child1->sval;
+            Symbol* fun_sym = lookup_function(func_name);
+            
+            if (!fun_sym) {
+                semantic_error("chamada de função não declarada", func_name, node->lineno);
+            } else {
+                Node* args = node->child2; 
+                
+                int arg_count = 0;
+                Node* arg = args;
+                while (arg) {
+                    arg_count++;
+                    arg = arg->sibling;
+                }
+                
+                int param_count = 0;
+                Symbol* p = fun_sym->params;
+                while (p) {
+                    param_count++;
+                    p = p->next;
+                }
+                
+                if (arg_count != param_count) {
+                    semantic_error("chamada inválida", "número de parâmetros inválido", node->lineno);
+                } else {
+                    arg = args;
+                    p = fun_sym->params;
+                    while (arg && p) {
+                        char* arg_type = get_expression_type(arg, current_scope);
+                        if (strcmp(arg_type, p->type) != 0) {
+                             if (strcmp(arg_type, "unknown") != 0 && strcmp(p->type, "unknown") != 0) {
+                                semantic_error("chamada inválida", "tipo de parâmetro inválido", node->lineno);
+                             }
+                        }
+                        arg = arg->sibling;
+                        p = p->next;
+                    }
+                }
+            }
+            break;
+        }
+        
+        case NODE_ID: {
+            char* name = node->sval;
+            Symbol* sym = lookup_symbol(name, current_scope);
+            if (!sym) {
+                semantic_error("variável não declarada", name, node->lineno);
+            }
+            break;
+        }
+        
+        case NODE_VAR_ARRAY: {
+            char* name = node->child1->sval;
+            Symbol* sym = lookup_symbol(name, current_scope);
+            if (!sym) {
+                semantic_error("variável não declarada", name, node->lineno);
+            }
+            analyze_node(node->child2, current_scope); 
+            break;
+        }
+        
+        case NODE_EXPRESSAO_REC: {
+            Node* var_node = node->child1;
+            Node* expr_node = node->child2;
+            
+            analyze_node(var_node, current_scope);
+            analyze_node(expr_node, current_scope);
+            
+            char* var_type = "unknown";
+            if (var_node->type == NODE_ID) {
+                Symbol* sym = lookup_symbol(var_node->sval, current_scope);
+                if (sym) var_type = sym->type;
+            } else if (var_node->type == NODE_VAR_ARRAY) {
+                 Symbol* sym = lookup_symbol(var_node->child1->sval, current_scope);
+                 if (sym) var_type = sym->type;
+            }
+            
+            char* expr_type = get_expression_type(expr_node, current_scope);
+            
+            if (strcmp(var_type, "int") == 0 && strcmp(expr_type, "void") == 0) {
+                 semantic_error("atribuição inválida", NULL, node->lineno);
+            }
+            break;
+        }
+
+        case NODE_RETORNO_DECL: {
+            if (strcmp(current_scope, "global") != 0) {
+                Symbol* fun_sym = lookup_function(current_scope);
+                if (fun_sym) {
+                    if (node->child1) { 
+                        if (strcmp(fun_sym->type, "void") == 0) {
+                            semantic_error("chamada inválida", "parâmetro de retorno da função não previsto", node->lineno);
+                        } else {
+                        }
+                    } else {
+                        if (strcmp(fun_sym->type, "int") == 0) {
+                        }
+                    }
+                }
+            }
+            break;
+        }
+        
+        default:
+            analyze_node(node->child1, current_scope);
+            analyze_node(node->child2, current_scope);
+            analyze_node(node->child3, current_scope);
+            break;
+    }
+    analyze_node(node->sibling, current_scope);
+}
+
+void semantic_analysis(Node* root) {
+    insert_symbol("input", "int", "global", "fun", 0);
+    
+    insert_symbol("output", "void", "global", "fun", 0);
+    Symbol* out_sym = lookup_function("output");
+    Symbol* param = create_symbol("x", "int", "output", "param", 0);
+    out_sym->params = param;
+    
+    analyze_node(root, "global");
+    
+    if (lookup_function("main") == NULL) {
+        semantic_error("função main() não declarada", NULL, 0); 
+    }
+    
+    print_symbol_table();
 }
