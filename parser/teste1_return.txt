@@ -1,0 +1,10 @@
+/* Teste 1: funcao int sem return */
+int sem_ret(void)
+{	int x;
+	x = 5;
+}
+
+void main(void)
+{	int y;
+	y = sem_ret();
+}

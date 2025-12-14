@@ -1,0 +1,6 @@
+/* Teste 2: atribuicao a array sem indice */
+int vet[10];
+
+void main(void)
+{	vet = 5;
+}

@@ -1,0 +1,23 @@
+/* Arquivo de teste para validar as correções semânticas */
+
+int arr[10];
+
+/* TESTE 1: Função int sem return - deve dar erro */
+int sem_return(void)
+{
+    int x;
+    x = 5;
+}
+
+/* TESTE 2: Array recebendo atribuição direta - deve dar erro */
+void teste_array(void)
+{
+    arr = 10;
+}
+
+/* TESTE 3: main correta - não deve dar erro */
+void main(void)
+{
+    int y;
+    y = sem_return();
+}

@@ -1,0 +1,5 @@
+/* Teste 3: main com tipo errado */
+int main(void)
+{	int x;
+	x = 1;
+}
