@@ -325,7 +325,7 @@ arg_lista:
 Node* create_node(NodeType type, Node* c1, Node* c2, Node* c3) {
     Node* n = (Node*) malloc(sizeof(Node));
     if (n == NULL) {
-        yyerror("Erro: Sem memória para criar nó da árvore");
+        yyerror("Erro: Sem memoria para criar no da arvore");
         exit(1);
     }
     n->type = type;
@@ -389,7 +389,7 @@ void print_tree(Node* node, int indent) {
         case NODE_ATIVACAO: printf("ATIVACAO (call)\n"); break;
         case NODE_ID: printf("ID (%s)\n", node->sval); break;
         case NODE_NUM: printf("NUM (%d)\n", node->ival); break;
-        default: printf("ERRO: Nó desconhecido (%d)\n", node->type);
+        default: printf("ERRO: No desconhecido (%d)\n", node->type);
     }
 
     print_tree(node->child1, indent + 1);
@@ -428,7 +428,7 @@ int main(int argc, char *argv[]) {
 }
 
 void yyerror(const char *s) {
-    printf("ERRO SINTÁTICO: %s LINHA: %d\n", yytext, yylineno);
+    printf("ERRO SINTATICO: %s LINHA: %d\n", yytext, yylineno);
 }
 
 typedef struct Symbol {
@@ -588,13 +588,13 @@ void analyze_node(Node* node, char* current_scope) {
             char* name = node->child2->sval;
             
             if (strcmp(type, "void") == 0) {
-                semantic_error("declaração inválida de variável", name, node->lineno);
+                semantic_error("declaração invalida de variavel", name, node->lineno);
             } 
             else if (is_declared_in_scope(name, current_scope)) {
-                semantic_error("declaração inválida de variável", name, node->lineno); 
+                semantic_error("declaração invalida de variavel", name, node->lineno); 
             } 
             else if (lookup_function(name)) {
-                 semantic_error("declaração inválida", name, node->lineno); 
+                 semantic_error("declaração invalida", name, node->lineno); 
             } else {
                 insert_symbol(name, type, current_scope, (node->type == NODE_VAR_DECLARACAO_ARRAY) ? "array" : "var", node->lineno);
             }
@@ -607,7 +607,7 @@ void analyze_node(Node* node, char* current_scope) {
             int fun_lineno = node->child1->lineno; 
             
             if (lookup_function(name)) {
-                semantic_error("declaração inválida", name, fun_lineno);
+                semantic_error("declaração invalida", name, fun_lineno);
             } else {
                 insert_symbol(name, type, "global", "fun", fun_lineno);
                 Symbol* fun_sym = symbol_table; 
@@ -623,7 +623,7 @@ void analyze_node(Node* node, char* current_scope) {
                             char* p_name = p->child2->sval;
                             
                             if (strcmp(p_type, "void") == 0) {
-                                semantic_error("declaração inválida de variável", p_name, p->lineno);
+                                semantic_error("declaração invalida de variavel", p_name, p->lineno);
                             } else {
                                 insert_symbol(p_name, p_type, name, "param", p->lineno);
                                 
@@ -682,7 +682,7 @@ void analyze_node(Node* node, char* current_scope) {
                 }
                 
                 if (arg_count != param_count) {
-                    semantic_error("chamada inválida", "número de parâmetros inválido", node->lineno);
+                    semantic_error("chamada invalida", "número de parâmetros invalido", node->lineno);
                 } else {
                     arg = args;
                     p = fun_sym->params;
@@ -690,7 +690,7 @@ void analyze_node(Node* node, char* current_scope) {
                         char* arg_type = get_expression_type(arg, current_scope);
                         if (strcmp(arg_type, p->type) != 0) {
                              if (strcmp(arg_type, "unknown") != 0 && strcmp(p->type, "unknown") != 0) {
-                                semantic_error("chamada inválida", "tipo de parâmetro inválido", node->lineno);
+                                semantic_error("chamada invalida", "tipo de parâmetro invalido", node->lineno);
                              }
                         }
                         arg = arg->sibling;
@@ -705,7 +705,7 @@ void analyze_node(Node* node, char* current_scope) {
             char* name = node->sval;
             Symbol* sym = lookup_symbol(name, current_scope);
             if (!sym) {
-                semantic_error("variável não declarada", name, node->lineno);
+                semantic_error("variavel não declarada", name, node->lineno);
             }
             break;
         }
@@ -714,7 +714,7 @@ void analyze_node(Node* node, char* current_scope) {
             char* name = node->child1->sval;
             Symbol* sym = lookup_symbol(name, current_scope);
             if (!sym) {
-                semantic_error("variável não declarada", name, node->lineno);
+                semantic_error("variavel não declarada", name, node->lineno);
             }
             analyze_node(node->child2, current_scope); 
             break;
@@ -738,7 +738,7 @@ void analyze_node(Node* node, char* current_scope) {
                 }
                 
                 if (sym && strcmp(sym->kind, "array") == 0) {
-                    semantic_error("atribuição inválida a array", var_node->sval, node->lineno);
+                    semantic_error("atribuição invalida a array", var_node->sval, node->lineno);
                 }
             } else if (var_node->type == NODE_VAR_ARRAY) {
                  Symbol* sym = lookup_symbol(var_node->child1->sval, current_scope);
@@ -748,7 +748,7 @@ void analyze_node(Node* node, char* current_scope) {
             char* expr_type = get_expression_type(expr_node, current_scope);
             
             if (strcmp(var_type, "int") == 0 && strcmp(expr_type, "void") == 0) {
-                 semantic_error("atribuição inválida", NULL, node->lineno);
+                 semantic_error("atribuição invalida", NULL, node->lineno);
             }
             break;
         }
@@ -759,7 +759,7 @@ void analyze_node(Node* node, char* current_scope) {
                 if (fun_sym) {
                     if (node->child1) { 
                         if (strcmp(fun_sym->type, "void") == 0) {
-                            semantic_error("chamada inválida", "parâmetro de retorno da função não previsto", node->lineno);
+                            semantic_error("chamada invalida", "parâmetro de retorno da função não previsto", node->lineno);
                         } else {
                         }
                     } else {
