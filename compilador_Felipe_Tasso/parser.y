@@ -58,6 +58,7 @@ void print_tree(Node* node, int indent);
 void semantic_analysis(Node* root);
 
 Node* ast_root = NULL;
+int syntax_error_count = 0;  // Contador de erros sintaticos
 
 %}
 
@@ -120,6 +121,7 @@ declaracao_lista:
 declaracao:
     var_declaracao { $$ = $1; }
     | fun_declaracao { $$ = $1; }
+    | error PEV { yyerrok; $$ = NULL; }  /* Recuperacao de erro em declaracao */
     ;
 
 var_declaracao:
@@ -208,6 +210,7 @@ statement:
     | selecao_decl { $$ = $1; }
     | iteracao_decl { $$ = $1; }
     | retorno_decl { $$ = $1; }
+    | error PEV { yyerrok; $$ = NULL; }  /* Recuperacao de erro em statement */
     ;
 
 expressao_decl:
@@ -412,7 +415,9 @@ int main(int argc, char *argv[]) {
     }
 
     printf("Iniciando analise sintatica de: %s\n", argv[1]);
-    if (yyparse() == 0) { 
+    int parse_result = yyparse();
+    
+    if (parse_result == 0 && syntax_error_count == 0) { 
         printf("Analise Sintatica concluida com SUCESSO!\n");
         printf("\nImprimindo Arvore Sintatica Abstrata:\n");
         print_tree(ast_root, 0);
@@ -420,7 +425,7 @@ int main(int argc, char *argv[]) {
         printf("\nIniciando Analise Semantica...\n");
         semantic_analysis(ast_root);
     } else {
-        printf("Analise Sintatica falhou.\n");
+        printf("Analise Sintatica concluida com %d erro(s) sintatico(s).\n", syntax_error_count);
     }
 
     fclose(f_in);
@@ -428,6 +433,7 @@ int main(int argc, char *argv[]) {
 }
 
 void yyerror(const char *s) {
+    syntax_error_count++;  // Incrementa contador
     printf("ERRO SINTATICO: %s LINHA: %d\n", yytext, yylineno);
 }
 
