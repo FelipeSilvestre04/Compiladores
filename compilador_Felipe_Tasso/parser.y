@@ -441,16 +441,13 @@ typedef struct Symbol {
     struct Symbol* params; 
 } Symbol;
 
-// Função auxiliar para verificar se uma função tem return
 int function_has_return(Node* node) {
     if (node == NULL) return 0;
     
-    // Se encontrou um NODE_RETORNO_DECL com expressão, retorna 1
     if (node->type == NODE_RETORNO_DECL && node->child1 != NULL) {
         return 1;
     }
     
-    // Busca recursivamente em todos os filhos e siblings
     if (function_has_return(node->child1)) return 1;
     if (function_has_return(node->child2)) return 1;
     if (function_has_return(node->child3)) return 1;
@@ -460,12 +457,14 @@ int function_has_return(Node* node) {
 }
 
 Symbol* symbol_table = NULL;
+int semantic_error_count = 0;  
 
 void semantic_error(char* msg, char* id, int lineno) {
+    semantic_error_count++;  
     if (id)
-        printf("ERRO SEMÂNTICO: %s %s LINHA: %d\n", msg, id, lineno);
+        printf("ERRO SEMANTICO: %s %s LINHA: %d\n", msg, id, lineno);
     else
-        printf("ERRO SEMÂNTICO: %s LINHA: %d\n", msg, lineno);
+        printf("ERRO SEMANTICO: %s LINHA: %d\n", msg, lineno);
 }
 
 Symbol* create_symbol(char* name, char* type, char* scope, char* kind, int lineno) {
@@ -605,7 +604,7 @@ void analyze_node(Node* node, char* current_scope) {
         case NODE_FUN_DECLARACAO: {
             char* type = get_type_from_node(node->child1);
             char* name = node->child2->sval;
-            int fun_lineno = node->child1->lineno;  // Linha do tipo (int/void)
+            int fun_lineno = node->child1->lineno; 
             
             if (lookup_function(name)) {
                 semantic_error("declaração inválida", name, fun_lineno);
@@ -646,7 +645,6 @@ void analyze_node(Node* node, char* current_scope) {
             
             analyze_node(node->child3, name);
             
-            // CORREÇÃO 1: Verificar se função int tem return com valor
             if (strcmp(type, "int") == 0) {
                 if (!function_has_return(node->child3)) {
                     semantic_error("função int sem retorno", name, node->lineno);
@@ -739,7 +737,6 @@ void analyze_node(Node* node, char* current_scope) {
                     var_kind = sym->kind;
                 }
                 
-                // CORREÇÃO 2: Verificar se está tentando atribuir a um array sem índice
                 if (sym && strcmp(sym->kind, "array") == 0) {
                     semantic_error("atribuição inválida a array", var_node->sval, node->lineno);
                 }
@@ -793,20 +790,23 @@ void semantic_analysis(Node* root) {
     
     analyze_node(root, "global");
     
-    // CORREÇÃO 3: Validação estrita da main: deve ser void main(void)
     Symbol* main_sym = lookup_function("main");
     if (main_sym == NULL) {
         semantic_error("função main() não declarada", NULL, 0); 
     } else {
-        // Verificar se main é void
         if (strcmp(main_sym->type, "void") != 0) {
             semantic_error("função main deve ser do tipo void", "main", main_sym->lineno);
         }
-        // Verificar se main não tem parâmetros
         if (main_sym->params != NULL) {
             semantic_error("função main não deve ter parâmetros", "main", main_sym->lineno);
         }
     }
     
     print_symbol_table();
+    
+    if (semantic_error_count == 0) {
+        printf("\nAnalise Semantica concluida com SUCESSO! Nenhum erro detectado.\n");
+    } else {
+        printf("\nAnalise Semantica concluida com %d erro(s).\n", semantic_error_count);
+    }
 }

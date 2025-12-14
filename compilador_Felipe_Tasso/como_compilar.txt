@@ -1,0 +1,41 @@
+Compilador para C-
+Felipe Silvestre
+Tasso Canellas
+
+============================================
+COMO COMPILAR
+============================================
+
+Pré-requisitos:
+- Bison (parser generator)
+- Flex (lexer generator)
+- GCC (compilador C)
+
+Comandos para compilar:
+
+1. Gerar o parser:
+   bison -d parser.y
+
+2. Gerar o scanner:
+   flex lexer.l
+
+3. Compilar o executável:
+   gcc -o compilador parser.tab.c lex.yy.c
+
+============================================
+COMO EXECUTAR
+============================================
+
+   .\compilador.exe <arquivo_entrada.txt>
+
+Exemplo:
+   .\compilador.exe sort.txt
+
+============================================
+ARQUIVOS GERADOS
+============================================
+
+- parser.tab.c : código do parser gerado pelo Bison
+- parser.tab.h : header com tokens
+- lex.yy.c     : código do scanner gerado pelo Flex
+- compilador.exe : executável final
