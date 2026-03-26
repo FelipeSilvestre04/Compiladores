@@ -1,0 +1,16 @@
+module DivisorFrequencia(clk50, clkSaida);
+input clk50;
+output reg clkSaida;
+
+reg [6:0]count;
+
+always@(posedge clk50)
+begin
+count = count + 1;
+if(count == 50) begin
+clkSaida = ~clkSaida;
+count = 0;
+end
+end
+
+endmodule

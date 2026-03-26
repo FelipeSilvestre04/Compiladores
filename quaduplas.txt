@@ -1,0 +1,54 @@
+================================================================================
+          TABELA DE QUÁDRUPLAS: COMPILADOR C- PARA RISC-V CUSTOMIZADO
+================================================================================
+Formato Padrão: (Operação, Argumento 1, Argumento 2, Resultado)
+Onde não há argumento, utiliza-se o traço "-".
+
+--- ARITMÉTICAS (TIPO R E I) ---
+(ADD, t1, t2, t3)       - Soma entre registradores: t3 = t1 + t2
+(SUB, t1, t2, t3)       - Subtração: t3 = t1 - t2
+(MULT, t1, t2, t3)      - Multiplicação nativa em hardware
+(DIV, t1, t2, t3)       - Divisão inteira nativa em hardware
+(ADDI, t1, imm, t2)     - Soma com valor imediato (constante)
+(SUBI, t1, imm, t2)     - Subtração nativa de imediato
+
+--- LÓGICAS E BITS ---
+(AND, t1, t2, t3)       - E Lógico (bitwise) entre registradores
+(OR, t1, t2, t3)        - OU Lógico (bitwise) entre registradores
+(XOR, t1, t2, t3)       - OU Exclusivo (bitwise) entre registradores
+(NOT, t1, -, t2)        - Inversão Lógica Unária nativa: t2 = ~t1
+(ANDI, t1, imm, t2)     - AND bit a bit com valor imediato
+(ORI, t1, imm, t2)      - OR bit a bit com valor imediato
+(XORI, t1, imm, t2)     - XOR bit a bit com valor imediato
+
+--- RELACIONAIS (Apoio para desvios e atribuições booleanas) ---
+(EQ, t1, t2, t3)        - Igualdade (==): t3 = 1 se verdadeiro, senão 0
+(NEQ, t1, t2, t3)       - Diferente (!=): t3 = 1 se verdadeiro, senão 0
+(LT, t1, t2, t3)        - Menor que (<): t3 = 1 se verdadeiro, senão 0
+(LE, t1, t2, t3)        - Menor ou Igual (<=): t3 = 1 se verdadeiro, senão 0
+(GT, t1, t2, t3)        - Maior que (>): t3 = 1 se verdadeiro, senão 0
+(GE, t1, t2, t3)        - Maior ou Igual (>=): t3 = 1 se verdadeiro, senão 0
+
+--- MEMÓRIA E ATRIBUIÇÃO ---
+(MOV, t1, -, t2)        - Atribuição/Cópia de registrador (Instrução Tipo I)
+(LDA, id, -, t1)        - Load Address: Carrega endereço de rótulo/variável
+(LOAD, t_end, -, t1)    - Lê dado da RAM para o registrador t1
+(STORE, t1, t_end, -)   - Escreve dado de t1 no endereço da RAM
+
+--- CONTROLE DE FLUX ---
+(LAB, label, -, -)      - Define um rótulo no código (ex: L1, L2)
+(JUMP, label, -, -)     - Salto incondicional
+(IFF, t1, label, -)     - If False: Salto condicional se t1 for 0 (Mapeia para Tipo B)
+
+--- FUNÇÕES E ESCOPO ---
+(FUN, tipo, id, -)      - Início de declaração de função
+(END, id, -, -)         - Fim da declaração de função
+(ALLOC, id, escopo, -)  - Alocação de memória (reserva espaço para variável)
+(PARAM, t1, -, -)       - Prepara argumento t1 para chamada de função
+(CALL, id, n_args, t1)  - Invoca função passando número de argumentos (Mapeia para JAL)
+(RET, t1, -, -)         - Retorno de valor t1 da função (Mapeia para JR)
+
+--- I/O E CONTROLE DE SISTEMA ---
+(IN, -, -, t1)          - Pausa execução e lê entrada dos switches para t1
+(OUT, t1, -, -)         - Exibe o valor de t1 no display de 7 segmentos
+(HALT, -, -, -)         - Interrompe o processador ao fim do programa

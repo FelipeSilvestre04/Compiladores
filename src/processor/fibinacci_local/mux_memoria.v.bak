@@ -1,0 +1,16 @@
+module mux_memoria(
+    input  [1:0]     sign,         // Sinal MemtoReg (2 bits)
+    input  [31:0]    ula_result,   // Entrada 00
+    input  [31:0]    mem_result,   // Entrada 01
+    input  [31:0]    pc_next,      // Entrada 10
+    output reg [31:0] rd_data
+);
+    always @(*) begin
+        case(sign)
+            2'b00:  rd_data = ula_result; // Seleciona resultado da ULA
+            2'b01:  rd_data = mem_result; // Seleciona dado da memória
+            2'b10:  rd_data = pc_next;      // Seleciona PC+1 para o JAL
+            default: rd_data = 32'hxxxxxxxx; // Valor indefinido para caso não usado
+        endcase
+    end
+endmodule

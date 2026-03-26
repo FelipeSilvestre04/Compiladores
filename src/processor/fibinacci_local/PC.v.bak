@@ -1,0 +1,29 @@
+// Módulo PC: Um registrador de 32 bits para o Program Counter.
+// Atualiza na borda de descida do clock e possui reset assíncrono.
+module PC (
+    input  logic       clk,      // Sinal de clock
+    input  logic       rst,      // Sinal de reset
+    input  [31:0]    PC_in,    // Próximo valor do PC (vindo do mux_pc)
+    output [31:0]    PC_out    // Valor atual do PC (para o resto do datapath)
+);
+
+    // Declaração do registrador interno que efetivamente armazena o valor.
+    reg [31:0] PC_reg;
+
+    // Lógica sequencial do registrador.
+    // O bloco é sensível à borda de descida do clock (negedge clk)
+    // ou à borda de subida do reset (posedge rst).
+    always @(negedge clk or posedge rst) begin
+        // Se o sinal de reset estiver ativo (1), o PC volta para o endereço 0.
+        if (rst)
+            PC_reg <= 32'h00000000;
+        // Caso contrário, na borda de descida do clock, o registrador
+        // captura o valor que está na entrada PC_in.
+        else
+            PC_reg <= PC_in;
+    end
+
+    // Conecta a saída do módulo ao valor armazenado no registrador interno.
+    assign PC_out = PC_reg;
+
+endmodule

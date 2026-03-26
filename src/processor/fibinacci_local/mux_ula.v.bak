@@ -1,0 +1,9 @@
+module mux_ula(
+    input  logic       sign,         // Sinal ALUSrc
+    input  [31:0]    rs2,          // Entrada 0 (vem do rs2_data)
+    input  [31:0]    im,           // Entrada 1 (vem do imediato_I_ex)
+    output [31:0]    reg_saida
+);
+    // Se sign=1, seleciona 'im'. Se sign=0, seleciona 'rs2'.
+    assign reg_saida = (sign == 1'b1) ? im : rs2;
+endmodule

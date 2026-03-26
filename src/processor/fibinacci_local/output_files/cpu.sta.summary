@@ -1,0 +1,113 @@
+------------------------------------------------------------
+Timing Analyzer Summary
+------------------------------------------------------------
+
+Type  : Slow 1200mV 85C Model Setup 'DivisorFrequencia:Divisor_inst|clkSaida'
+Slack : -137.366
+TNS   : -30988.034
+
+Type  : Slow 1200mV 85C Model Setup 'clk_50'
+Slack : -3.602
+TNS   : -45.431
+
+Type  : Slow 1200mV 85C Model Hold 'clk_50'
+Slack : 0.440
+TNS   : 0.000
+
+Type  : Slow 1200mV 85C Model Hold 'DivisorFrequencia:Divisor_inst|clkSaida'
+Slack : 0.887
+TNS   : 0.000
+
+Type  : Slow 1200mV 85C Model Recovery 'btn_in'
+Slack : -1.638
+TNS   : -1.638
+
+Type  : Slow 1200mV 85C Model Removal 'btn_in'
+Slack : 1.570
+TNS   : 0.000
+
+Type  : Slow 1200mV 85C Model Minimum Pulse Width 'clk_50'
+Slack : -3.000
+TNS   : -36.410
+
+Type  : Slow 1200mV 85C Model Minimum Pulse Width 'btn_in'
+Slack : -3.000
+TNS   : -4.285
+
+Type  : Slow 1200mV 85C Model Minimum Pulse Width 'DivisorFrequencia:Divisor_inst|clkSaida'
+Slack : -1.285
+TNS   : -352.090
+
+Type  : Slow 1200mV 0C Model Setup 'DivisorFrequencia:Divisor_inst|clkSaida'
+Slack : -124.013
+TNS   : -27973.823
+
+Type  : Slow 1200mV 0C Model Setup 'clk_50'
+Slack : -3.241
+TNS   : -38.248
+
+Type  : Slow 1200mV 0C Model Hold 'clk_50'
+Slack : 0.399
+TNS   : 0.000
+
+Type  : Slow 1200mV 0C Model Hold 'DivisorFrequencia:Divisor_inst|clkSaida'
+Slack : 0.784
+TNS   : 0.000
+
+Type  : Slow 1200mV 0C Model Recovery 'btn_in'
+Slack : -1.382
+TNS   : -1.382
+
+Type  : Slow 1200mV 0C Model Removal 'btn_in'
+Slack : 1.409
+TNS   : 0.000
+
+Type  : Slow 1200mV 0C Model Minimum Pulse Width 'clk_50'
+Slack : -3.000
+TNS   : -36.410
+
+Type  : Slow 1200mV 0C Model Minimum Pulse Width 'btn_in'
+Slack : -3.000
+TNS   : -4.285
+
+Type  : Slow 1200mV 0C Model Minimum Pulse Width 'DivisorFrequencia:Divisor_inst|clkSaida'
+Slack : -1.285
+TNS   : -352.090
+
+Type  : Fast 1200mV 0C Model Setup 'DivisorFrequencia:Divisor_inst|clkSaida'
+Slack : -67.955
+TNS   : -15310.021
+
+Type  : Fast 1200mV 0C Model Setup 'clk_50'
+Slack : -1.227
+TNS   : -9.247
+
+Type  : Fast 1200mV 0C Model Hold 'clk_50'
+Slack : 0.199
+TNS   : 0.000
+
+Type  : Fast 1200mV 0C Model Hold 'DivisorFrequencia:Divisor_inst|clkSaida'
+Slack : 0.401
+TNS   : 0.000
+
+Type  : Fast 1200mV 0C Model Recovery 'btn_in'
+Slack : -0.071
+TNS   : -0.071
+
+Type  : Fast 1200mV 0C Model Removal 'btn_in'
+Slack : 0.378
+TNS   : 0.000
+
+Type  : Fast 1200mV 0C Model Minimum Pulse Width 'clk_50'
+Slack : -3.000
+TNS   : -30.456
+
+Type  : Fast 1200mV 0C Model Minimum Pulse Width 'btn_in'
+Slack : -3.000
+TNS   : -4.459
+
+Type  : Fast 1200mV 0C Model Minimum Pulse Width 'DivisorFrequencia:Divisor_inst|clkSaida'
+Slack : -1.000
+TNS   : -274.000
+
+------------------------------------------------------------

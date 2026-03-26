@@ -1,0 +1,20 @@
+# ANÁLISE DE PROBLEMAS: LOAD E STORE (Verilog)
+
+Estes são os dois principais problemas que impedem o funcionamento correto do LOAD e STORE no hardware atual:
+
+## 1. DATA_WIDTH Incorreta no ram.v
+O arquivo `ram.v` está configurado com `DATA_WIDTH=4`.
+- **PROBLEMA**: Como o RISC-V é 32-bit, qualquer `STORE` de 32 bits será truncado para apenas 4 bits. Ao dar `LOAD`, você só receberá os últimos 4 bits da variável.
+- **SOLUÇÃO**: Alterar o parâmetro em `ram.v` para `DATA_WIDTH=32`.
+
+## 2. Conflito entre Endereçamento de Byte e Palavra
+- **NO COMPILADOR (Byte Addressing)**: O compilador gera offsets de 4 em 4 (`0, 4, 8, 12...`) pois cada inteiro tem 4 bytes.
+- **NA RAM (Word Addressing)**: A sua RAM atual entende endereços de 1 em 1. Se você pede o endereço `4`, a RAM busca o índice **4** (que seria o 5º inteiro da memória), pulando os endereços 1, 2 e 3.
+- **SOLUÇÃO SUGERIDA**: No seu módulo `ram.v`, use o endereço deslocado para a direita em 2 bits para "ignorar" os bits de byte:
+  ```verilog
+  // Dentro do bloco de leitura e escrita da RAM:
+  q <= ram[read_addr[31:2]]; // Divide por 4 para converter byte em word
+  ```
+
+## 3. Verificação de Sinais de Controle
+- Verifique se o sinal `RegWrite` está mesmo chegando ao banco de registradores durante o `LOAD`. No seu `Unidade_Controle.v`, ele parece estar correto (`RegWrite=1` quando `op=001` e `funct=0000`).
