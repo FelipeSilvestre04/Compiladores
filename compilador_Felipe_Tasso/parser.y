@@ -467,10 +467,17 @@ int semantic_error_count = 0;
 
 void semantic_error(char* msg, char* id, int lineno) {
     semantic_error_count++;  
-    if (id)
-        printf("ERRO SEMANTICO: %s %s LINHA: %d\n", msg, id, lineno);
-    else
-        printf("ERRO SEMANTICO: %s LINHA: %d\n", msg, lineno);
+    if (lineno > 0) {
+        if (id)
+            printf("ERRO SEMANTICO: %s '%s' LINHA: %d\n", msg, id, lineno);
+        else
+            printf("ERRO SEMANTICO: %s LINHA: %d\n", msg, lineno);
+    } else {
+        if (id)
+            printf("ERRO SEMANTICO: %s '%s'\n", msg, id);
+        else
+            printf("ERRO SEMANTICO: %s\n", msg);
+    }
 }
 
 Symbol* create_symbol(char* name, char* type, char* scope, char* kind, int lineno) {
@@ -495,7 +502,6 @@ Symbol* lookup_symbol(char* name, char* scope) {
     Symbol* s = symbol_table;
     while (s != NULL) {
         if (strcmp(s->name, name) == 0) {
-            
             if (strcmp(s->scope, scope) == 0) {
                 return s;
             }
@@ -539,10 +545,14 @@ int is_declared_in_scope(char* name, char* scope) {
 
 void print_symbol_table() {
     printf("\nTABELA DE SIMBOLOS:\n");
-    printf("%-20s %-10s %-10s %-10s %-10s\n", "Nome", "Tipo", "Escopo", "Categoria", "Linha");
+    printf("%-20s %-10s %-20s %-10s %-10s\n", "Nome", "Tipo", "Escopo", "Categoria", "Linha");
     Symbol* s = symbol_table;
     while (s != NULL) {
-        printf("%-20s %-10s %-10s %-10s %d\n", s->name, s->type, s->scope, s->kind, s->lineno);
+        if (s->name && strlen(s->name) > 0) {
+            printf("%-20s %-10s %-20s %-10s %d\n", s->name, s->type, s->scope, s->kind, s->lineno);
+        } else {
+            printf("%-20s %-10s %-20s %-10s %d\n", "(vazio)", s->type, s->scope, s->kind, s->lineno);
+        }
         s = s->next;
     }
 }
@@ -659,10 +669,11 @@ void analyze_node(Node* node, char* current_scope) {
             break;
         }
         
-        case NODE_COMPOSTO_DECL:
+        case NODE_COMPOSTO_DECL: {
             analyze_node(node->child1, current_scope); 
             analyze_node(node->child2, current_scope); 
             break;
+        }
             
         case NODE_ATIVACAO: {
             char* func_name = node->child1->sval;
