@@ -1,0 +1,235 @@
+digraph "Diagrama de Atividades — Gerador de Código Intermediário" {
+	bgcolor="#0f172a" dpi=200 fontname="Segoe UI" nodesep=0.4 pad=0.5 rankdir=TB ranksep=0.55
+	node [color="#334155" fontcolor=white fontname="Segoe UI" fontsize=11 style=filled]
+	edge [color="#64748b" fontcolor="#94a3b8" fontname="Segoe UI" fontsize=9]
+	titulo [label="«activity»
+Gerador de Código Intermediário (Quádruplas)
+Compilador C- → RISC-V Customizado" fontcolor="#e2e8f0" fontname="Segoe UI Semibold" fontsize=16 shape=plaintext]
+	start [label="" color="#22d3ee" fillcolor="#22d3ee" shape=circle width=0.3]
+	recebe_ast [label="Receber AST (raiz)
+generate_code(root)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	pega_filho [label="p = root→child1
+(1ª declaração)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	check_p [label="p ≠ NULL?" color="#f59e0b" fillcolor="#f59e0b" fontcolor="#0f172a" fontsize=9 height=0.4 shape=diamond width=0.4]
+	tipo_no [label="Tipo
+do nó?" color="#f59e0b" fillcolor="#f59e0b" fontcolor="#0f172a" fontsize=9 height=0.4 shape=diamond width=0.4]
+	gera_decl_var [label="gera_declaracao(p)
+emit(ALLOC, nome, escopo, -)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	nota_alloc [label="Reserva espaço
+na memória para
+a variável" color="#475569" fillcolor="#1e293b" fontcolor="#cbd5e1" fontsize=9 margin="0.1,0.06" shape=note style=filled]
+	emit_fun [label="emit(FUN, tipo, nome, -)
+\"Início da função\"" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	gera_corpo [label="gera_comando(corpo, escopo)
+→ percorre o corpo da função" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	emit_end [label="emit(END, nome, -, -)
+\"Fim da função\"" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	subgraph cluster_fun {
+		bgcolor="#0f172a" color="#38bdf8" fontcolor="#38bdf8" fontname="Segoe UI Semibold" fontsize=11 label="  «swimlane» gera_declaracao — Função  " margin=16 style=dashed
+	}
+	next_sibling [label="p = p→sibling
+(próxima declaração)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	emit_halt [label="emit(HALT, -, -, -)
+Finaliza o programa" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	end [label="" color="#22d3ee" fillcolor="#22d3ee" shape=doublecircle width=0.3]
+	titulo -> start [color="#64748b" fontcolor="#94a3b8" style=invis]
+	start -> recebe_ast [color="#64748b" fontcolor="#94a3b8"]
+	recebe_ast -> pega_filho [color="#64748b" fontcolor="#94a3b8"]
+	pega_filho -> check_p [color="#64748b" fontcolor="#94a3b8"]
+	check_p -> tipo_no [label="  Sim  " color="#64748b" fontcolor="#94a3b8" style="#22d3ee"]
+	check_p -> emit_halt [label="  Não
+(fim da lista)  " color="#64748b" fontcolor="#94a3b8" style="#ef4444"]
+	tipo_no -> gera_decl_var [label="  VAR_DECLARACAO
+VAR_DECLARACAO_ARRAY  " color="#64748b" fontcolor="#94a3b8"]
+	tipo_no -> emit_fun [label="  FUN_DECLARACAO  " color="#64748b" fontcolor="#94a3b8"]
+	gera_decl_var -> next_sibling [color="#64748b" fontcolor="#94a3b8"]
+	gera_decl_var -> nota_alloc [color="#475569" fontcolor="#94a3b8" style=dashed]
+	emit_fun -> gera_corpo [color="#64748b" fontcolor="#94a3b8"]
+	gera_corpo -> emit_end [color="#64748b" fontcolor="#94a3b8"]
+	emit_end -> next_sibling [color="#64748b" fontcolor="#94a3b8"]
+	next_sibling -> check_p [color="#22d3ee" fontcolor="#94a3b8" style=dashed]
+	emit_halt -> end [color="#64748b" fontcolor="#94a3b8"]
+	cmd_start [label="" color="#22d3ee" fillcolor="#22d3ee" shape=circle width=0.3]
+	cmd_tipo [label="Tipo
+do nó?" color="#f59e0b" fillcolor="#f59e0b" fontcolor="#0f172a" fontsize=9 height=0.4 shape=diamond width=0.4]
+	if_cond [label="gera_expressao(condição)
+→ $t_cond" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	if_labels [label="L_else = newLabel()
+L_fim = newLabel()" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	if_iff [label="emit(IFF, $t_cond, L_else, -)
+«desvio condicional»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	if_then [label="gera_comando(corpo_THEN)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	if_jump [label="emit(JUMP, L_fim, -, -)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	if_lab_else [label="emit(LAB, L_else, -, -)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	has_else [label="Tem
+ELSE?" color="#f59e0b" fillcolor="#f59e0b" fontcolor="#0f172a" fontsize=9 height=0.4 shape=diamond width=0.4]
+	if_else_body [label="gera_comando(corpo_ELSE)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	if_lab_fim [label="emit(LAB, L_fim, -, -)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	wh_labels [label="L_inicio = newLabel()
+L_fim = newLabel()" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	wh_lab_ini [label="emit(LAB, L_inicio, -, -)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	wh_cond [label="gera_expressao(condição)
+→ $t_cond" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	wh_iff [label="emit(IFF, $t_cond, L_fim, -)
+«sai se falso»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	wh_corpo [label="gera_comando(corpo_loop)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	wh_jump [label="emit(JUMP, L_inicio, -, -)
+«volta ao teste»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	wh_lab_fim [label="emit(LAB, L_fim, -, -)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	ret_has_expr [label="Tem
+expr?" color="#f59e0b" fillcolor="#f59e0b" fontcolor="#0f172a" fontsize=9 height=0.4 shape=diamond width=0.4]
+	ret_expr [label="gera_expressao(expr)
+→ $t_ret" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	ret_emit [label="emit(RET, $t_ret, -, -)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	ret_void [label="emit(RET, -, -, -)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	cmd_expr [label="gera_expressao(node)
+«expressão como statement»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	cmd_decl_local [label="gera_declaracao(node)
+emit(ALLOC, ...)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	cmd_sibling [label="gera_comando(node→sibling)
+«próximo statement»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	cmd_end [label="" color="#22d3ee" fillcolor="#22d3ee" shape=doublecircle width=0.3]
+	cmd_start -> cmd_tipo [color="#64748b" fontcolor="#94a3b8"]
+	cmd_tipo -> if_cond [label="  SELECAO_DECL
+(IF-ELSE)  " color="#64748b" fontcolor="#94a3b8"]
+	if_cond -> if_labels [color="#64748b" fontcolor="#94a3b8"]
+	if_labels -> if_iff [color="#64748b" fontcolor="#94a3b8"]
+	if_iff -> if_then [color="#64748b" fontcolor="#94a3b8"]
+	if_then -> if_jump [color="#64748b" fontcolor="#94a3b8"]
+	if_jump -> if_lab_else [color="#64748b" fontcolor="#94a3b8"]
+	if_lab_else -> has_else [color="#64748b" fontcolor="#94a3b8"]
+	has_else -> if_else_body [label="  Sim  " color="#64748b" fontcolor="#94a3b8" style="#22d3ee"]
+	has_else -> if_lab_fim [label="  Não  " color="#64748b" fontcolor="#94a3b8" style="#ef4444"]
+	if_else_body -> if_lab_fim [color="#64748b" fontcolor="#94a3b8"]
+	if_lab_fim -> cmd_sibling [color="#64748b" fontcolor="#94a3b8"]
+	cmd_tipo -> wh_labels [label="  ITERACAO_DECL
+(WHILE)  " color="#64748b" fontcolor="#94a3b8"]
+	wh_labels -> wh_lab_ini [color="#64748b" fontcolor="#94a3b8"]
+	wh_lab_ini -> wh_cond [color="#64748b" fontcolor="#94a3b8"]
+	wh_cond -> wh_iff [color="#64748b" fontcolor="#94a3b8"]
+	wh_iff -> wh_corpo [color="#64748b" fontcolor="#94a3b8"]
+	wh_corpo -> wh_jump [color="#64748b" fontcolor="#94a3b8"]
+	wh_jump -> wh_lab_fim [color="#64748b" fontcolor="#94a3b8"]
+	wh_lab_fim -> cmd_sibling [color="#64748b" fontcolor="#94a3b8"]
+	cmd_tipo -> ret_has_expr [label="  RETORNO_DECL
+(RETURN)  " color="#64748b" fontcolor="#94a3b8"]
+	ret_has_expr -> ret_expr [label="  Sim  " color="#64748b" fontcolor="#94a3b8" style="#22d3ee"]
+	ret_has_expr -> ret_void [label="  Não  " color="#64748b" fontcolor="#94a3b8" style="#ef4444"]
+	ret_expr -> ret_emit [color="#64748b" fontcolor="#94a3b8"]
+	ret_emit -> cmd_sibling [color="#64748b" fontcolor="#94a3b8"]
+	ret_void -> cmd_sibling [color="#64748b" fontcolor="#94a3b8"]
+	cmd_tipo -> cmd_expr [label="  Expressão
+solta  " color="#64748b" fontcolor="#94a3b8"]
+	cmd_tipo -> cmd_decl_local [label="  VAR_DECLARACAO
+local  " color="#64748b" fontcolor="#94a3b8"]
+	cmd_expr -> cmd_sibling [color="#64748b" fontcolor="#94a3b8"]
+	cmd_decl_local -> cmd_sibling [color="#64748b" fontcolor="#94a3b8"]
+	cmd_sibling -> cmd_end [color="#64748b" fontcolor="#94a3b8"]
+	subgraph cluster_cmd {
+		bgcolor="#0f172a" color="#a78bfa" fontcolor="#a78bfa" fontname="Segoe UI Semibold" fontsize=11 label="  «swimlane» gera_comando — Comandos (Statements)  " margin=16 style=dashed
+	}
+	gera_corpo -> cmd_start [color="#a78bfa" fontcolor="#94a3b8" style=dashed]
+	expr_start [label="" color="#22d3ee" fillcolor="#22d3ee" shape=circle width=0.3]
+	expr_tipo [label="Tipo
+do nó?" color="#f59e0b" fillcolor="#f59e0b" fontcolor="#0f172a" fontsize=9 height=0.4 shape=diamond width=0.4]
+	expr_num [label="t = newTemp()
+emit(ADDI, $zero, valor, t)
+«carrega constante»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_id [label="t = newTemp()
+emit(LOAD, nome, -, t)
+«lê variável»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_arr_idx [label="t_idx = gera_expressao(índice)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_arr_load [label="t = newTemp()
+emit(LOAD, nome, t_idx, t)
+«lê vetor[i]»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_arit_l [label="t1 = gera_expressao(esquerdo)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_arit_r [label="t2 = gera_expressao(direito)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_arit_op [label="t = newTemp()
+emit(OP, t1, t2, t)
+OP ∈ {ADD,SUB,MULT,DIV}" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_rel_l [label="t1 = gera_expressao(esquerdo)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_rel_r [label="t2 = gera_expressao(direito)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_rel_op [label="t = newTemp()
+emit(REL, t1, t2, t)
+REL ∈ {EQ,NEQ,LT,LE,GT,GE}" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_atr_val [label="t_val = gera_expressao(expr_direita)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_atr_tipo [label="Destino?" color="#f59e0b" fillcolor="#f59e0b" fontcolor="#0f172a" fontsize=9 height=0.4 shape=diamond width=0.4]
+	expr_atr_var [label="emit(STORE, t_val, nome, -)
+«x = expr»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_atr_arr [label="t_idx = gera_expressao(índice)
+emit(STORE, t_val, nome, t_idx)
+«v[i] = expr»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_call_tipo [label="Qual
+função?" color="#f59e0b" fillcolor="#f59e0b" fontcolor="#0f172a" fontsize=9 height=0.4 shape=diamond width=0.4]
+	expr_call_in [label="t = newTemp()
+emit(IN, -, -, t)
+«input()»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_call_out [label="t = gera_expressao(arg)
+emit(OUT, t, -, -)
+«output(x)»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_call_args [label="Para cada argumento:
+  t = gera_expressao(arg)
+  emit(PARAM, t, -, -)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_call_emit [label="t = newTemp()
+emit(CALL, nome, n_args, t)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_retorna [label="return t
+«temporário com resultado»" color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white margin="0.15,0.08" shape=box style="filled,rounded"]
+	expr_end [label="" color="#22d3ee" fillcolor="#22d3ee" shape=doublecircle width=0.3]
+	expr_start -> expr_tipo [color="#64748b" fontcolor="#94a3b8"]
+	expr_tipo -> expr_num [label="  NODE_NUM  " color="#64748b" fontcolor="#94a3b8"]
+	expr_tipo -> expr_id [label="  NODE_ID  " color="#64748b" fontcolor="#94a3b8"]
+	expr_tipo -> expr_arr_idx [label="  NODE_VAR_ARRAY  " color="#64748b" fontcolor="#94a3b8"]
+	expr_arr_idx -> expr_arr_load [color="#64748b" fontcolor="#94a3b8"]
+	expr_tipo -> expr_arit_l [label="  SOMA/SUB
+MULT/DIV  " color="#64748b" fontcolor="#94a3b8"]
+	expr_arit_l -> expr_arit_r [color="#64748b" fontcolor="#94a3b8"]
+	expr_arit_r -> expr_arit_op [color="#64748b" fontcolor="#94a3b8"]
+	expr_tipo -> expr_rel_l [label="  NODE_RELACIONAL  " color="#64748b" fontcolor="#94a3b8"]
+	expr_rel_l -> expr_rel_r [color="#64748b" fontcolor="#94a3b8"]
+	expr_rel_r -> expr_rel_op [color="#64748b" fontcolor="#94a3b8"]
+	expr_tipo -> expr_atr_val [label="  EXPRESSAO_REC
+(atribuição)  " color="#64748b" fontcolor="#94a3b8"]
+	expr_atr_val -> expr_atr_tipo [color="#64748b" fontcolor="#94a3b8"]
+	expr_atr_tipo -> expr_atr_var [label="  Variável
+simples  " color="#64748b" fontcolor="#94a3b8" style="#22d3ee"]
+	expr_atr_tipo -> expr_atr_arr [label="  Vetor
+v[i]  " color="#64748b" fontcolor="#94a3b8" style="#f59e0b"]
+	expr_tipo -> expr_call_tipo [label="  NODE_ATIVACAO
+(chamada)  " color="#64748b" fontcolor="#94a3b8"]
+	expr_call_tipo -> expr_call_in [label="  input()  " color="#64748b" fontcolor="#94a3b8" style="#22d3ee"]
+	expr_call_tipo -> expr_call_out [label="  output()  " color="#64748b" fontcolor="#94a3b8" style="#f59e0b"]
+	expr_call_tipo -> expr_call_args [label="  Genérica  " color="#64748b" fontcolor="#94a3b8" style="#a78bfa"]
+	expr_call_args -> expr_call_emit [color="#64748b" fontcolor="#94a3b8"]
+	expr_num -> expr_retorna [color="#334155" fontcolor="#94a3b8"]
+	expr_id -> expr_retorna [color="#334155" fontcolor="#94a3b8"]
+	expr_arr_load -> expr_retorna [color="#334155" fontcolor="#94a3b8"]
+	expr_arit_op -> expr_retorna [color="#334155" fontcolor="#94a3b8"]
+	expr_rel_op -> expr_retorna [color="#334155" fontcolor="#94a3b8"]
+	expr_atr_var -> expr_retorna [color="#334155" fontcolor="#94a3b8"]
+	expr_atr_arr -> expr_retorna [color="#334155" fontcolor="#94a3b8"]
+	expr_call_in -> expr_retorna [color="#334155" fontcolor="#94a3b8"]
+	expr_call_out -> expr_retorna [color="#334155" fontcolor="#94a3b8"]
+	expr_call_emit -> expr_retorna [color="#334155" fontcolor="#94a3b8"]
+	expr_retorna -> expr_end [color="#64748b" fontcolor="#94a3b8"]
+	subgraph cluster_expr {
+		bgcolor="#0f172a" color="#34d399" fontcolor="#34d399" fontname="Segoe UI Semibold" fontsize=11 label="  «swimlane» gera_expressao — Expressões (retorna temporário)  " margin=16 style=dashed
+	}
+	if_cond -> expr_start [color="#34d399" fontcolor="#94a3b8" style=dashed]
+	wh_cond -> expr_start [color="#34d399" fontcolor="#94a3b8" style=dashed]
+	ret_expr -> expr_start [color="#34d399" fontcolor="#94a3b8" style=dashed]
+	cmd_expr -> expr_start [color="#34d399" fontcolor="#94a3b8" style=dashed]
+	subgraph cluster_legenda {
+		bgcolor="#1e293b" color="#475569" fontcolor="#94a3b8" fontsize=10 label="  Legenda  " margin=12 style=rounded
+		leg1 [label="      Ação      " color="#38bdf8" fillcolor="#1e3a5f" fontcolor=white fontsize=9 shape=box style="filled,rounded"]
+		leg2 [label="  Decisão  " color="#f59e0b" fillcolor="#f59e0b" fontcolor="#0f172a" fontsize=9 height=0.5 shape=diamond width=0.5]
+		leg3 [label="" color="#22d3ee" fillcolor="#22d3ee" shape=circle width=0.2]
+		leg3l [label="Início / Fim" fontcolor="#94a3b8" fontsize=9 shape=plaintext]
+		leg4 [label="emit(...)" color="#38bdf8" fillcolor="#1e3a5f" fontcolor="#22d3ee" fontsize=9 shape=box style="filled,rounded"]
+		leg4l [label="= Gera Quádrupla" fontcolor="#94a3b8" fontsize=9 shape=plaintext]
+		leg1 -> leg2 [style=invis]
+		leg2 -> leg3 [style=invis]
+		leg3 -> leg3l [style=invis]
+		leg3l -> leg4 [style=invis]
+		leg4 -> leg4l [style=invis]
+	}
+}

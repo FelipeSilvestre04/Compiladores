@@ -1,0 +1,20 @@
+0: (FUN, int, main, -)    -> Início da função main.
+1: (ALLOC, x, main, -)     -> Aloca memória para a variável x.
+2: (ALLOC, y, main, -)     -> Aloca memória para a variável y.
+3: (IN, -, -, $t0)         -> Lê valor do teclado para o temporário $t0.
+4: (STORE, $t0, x, -)      -> Salva o valor de $t0 na variável x.
+5: (IN, -, -, $t1)         -> Lê valor do teclado para o temporário $t1.
+6: (STORE, $t1, y, -)      -> Salva o valor de $t1 na variável y.
+7: (LOAD, x, -, $t2)       -> Carrega o valor de x no temporário $t2.
+8: (LOAD, y, -, $t3)       -> Carrega o valor de y no temporário $t3.
+9: (GT, $t2, $t3, $t4)     -> Verifica se $t2 > $t3 e guarda resultado em $t4.
+10: (IFF, $t4, L0, -)      -> Se a condição for falsa (0), pula para o rótulo L0 (Else).
+11: (LOAD, x, -, $t5)      -> Carrega o valor de x no temporário $t5.
+12: (OUT, $t5, -, -)       -> Exibe o valor de $t5 na tela (output x).
+13: (JUMP, L1, -, -)       -> Pula para o fim do IF/ELSE (rótulo L1).
+14: (LAB, L0, -, -)        -> Define o ponto de início do bloco Else.
+15: (LOAD, y, -, $t6)      -> Carrega o valor de y no temporário $t6.
+16: (OUT, $t6, -, -)       -> Exibe o valor de $t6 na tela (output y).
+17: (LAB, L1, -, -)        -> Define o ponto de fim da estrutura IF/ELSE.
+18: (END, main, -, -)      -> Marca o fim da função main.
+19: (HALT, -, -, -)        -> Finaliza a execução do programa.

@@ -1,0 +1,40 @@
+@startuml
+title Diagrama de Blocos - Pipeline do Compilador C-
+skinparam backgroundColor #FEFEFE
+skinparam componentBackgroundColor #E3F2FD
+skinparam componentBorderColor #1565C0
+skinparam packageBackgroundColor #FAFAFA
+skinparam packageBorderColor #BDBDBD
+skinparam arrowColor #333333
+left to right direction
+
+[Codigo C-\n(.txt)] as INPUT
+
+package "Front-End" {
+  [Analise Lexica\n(Flex / lexer.l)\nTokens] as LEX
+  [Analise Sintatica\n(Bison / parser.y)\nAST] as PARSER
+  [Analise Semantica\n(semantic.c)\nTabela de Simbolos] as SEM
+}
+
+package "Back-End (gerador_quaduplas.c)" {
+  [processa_arvore\nPercorre a AST\nGera quadruplas] as PROC
+  [salvar_arquivo\nDispatcher] as DISP
+  [Fase 1\nsalvar_quad] as F1
+  [Fase 2\nSwitch-Case\nExpansao] as F2
+}
+
+database "saida.quad\nCodigo Intermediario" as QUAD
+database "saida.asm\nAssembly Real" as ASM
+
+INPUT --> LEX : texto
+LEX --> PARSER : tokens
+PARSER --> SEM : AST
+SEM --> PROC : AST validada
+
+PROC --> DISP : quadrupla
+DISP --> F1
+DISP --> F2
+F1 --> QUAD
+F2 --> ASM
+
+@enduml

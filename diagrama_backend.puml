@@ -1,0 +1,29 @@
+@startuml
+title Diagrama de Blocos - Back-End do Compilador C-
+skinparam backgroundColor #FEFEFE
+skinparam componentBackgroundColor #E3F2FD
+skinparam componentBorderColor #1565C0
+skinparam packageBackgroundColor #FAFAFA
+skinparam packageBorderColor #BDBDBD
+skinparam arrowColor #333333
+
+[AST Validada] as AST
+
+package "Back-End (gerador_quaduplas.c)" {
+  [processa_arvore\nPercorre a AST recursivamente\nIdentifica cada no e gera quadruplas] as PROC
+  [salvar_arquivo\nRecebe cada quadrupla\ne despacha para as duas fases] as DISP
+  [Fase 1: salvar_quad\nEscreve a quadrupla\ndiretamente como recebida] as F1
+  [Fase 2: Switch-Case\nExpande quadruplas complexas\nem instrucoes reais do processador] as F2
+}
+
+database "saida.quad\nCodigo Intermediario\n(OP, ARG1, ARG2, RES)" as QUAD
+database "saida.asm\nAssembly Real\nOP rd, rs1, rs2" as ASM
+
+AST --> PROC
+PROC --> DISP : quadrupla
+DISP --> F1
+DISP --> F2
+F1 --> QUAD
+F2 --> ASM
+
+@enduml

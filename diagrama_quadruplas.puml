@@ -1,0 +1,104 @@
+@startuml
+title Diagrama de Atividades - Gerador de Quadruplas
+skinparam backgroundColor #FEFEFE
+
+start
+:Limpar saida.quad e saida.asm
+Inicializar regs_vetor = todos livres
+Inicializar label_counter = 0;
+
+:Chamar processa_arvore(raiz);
+
+if (node == NULL?) then (sim)
+  :Retorna "-";
+  stop
+else (nao)
+endif
+
+switch (node->type?)
+
+case (NODE_PROGRAMA)
+  :Emite (JUMP, main, -, -);
+  :Percorre todos os filhos
+  chamando processa_arvore;
+  :Emite (HALT, -, -, -);
+
+case (NODE_FUN_DECLARACAO)
+  :Emite (FUN, tipo, nome, -);
+  :Para cada parametro
+  emite (ARG, nome_param, -, -);
+  :Emite SAVE_RA (interno);
+  :Processa corpo da funcao;
+  :Emite (END, nome, -, -);
+
+case (NODE_RETORNO_DECL)
+  :Processa expressao de retorno
+  via processa_arvore(child1);
+  :Emite (RET, valor, -, -);
+
+case (NODE_ATIVACAO)
+  if (input?) then (sim)
+    :Aloca reg temporario;
+    :Emite (IN, -, -, reg);
+  elseif (output?) then (sim)
+    :Processa argumento;
+    :Emite (OUT, valor, -, -);
+  else (funcao normal)
+    :Empilha args em ordem reversa
+    via empilhar_parametros_reverso;
+    :Para cada arg emite
+    (PARAM, valor, -, -);
+    :Aloca reg temporario;
+    :Emite (CALL, func, n, reg);
+  endif
+
+case (NODE_SELECAO_DECL)
+  :Gera label_else e label_fim;
+  :Processa operandos da comparacao;
+  :Emite branch invertido direto
+  EQ->BNE  GT->BLE  LT->BGE
+  NEQ->BEQ  LE->BGT  GE->BLT;
+  :Processa bloco THEN;
+  :Emite (JUMP, label_fim, -, -);
+  :Emite (LAB, label_else, -, -);
+  :Processa bloco ELSE se existir;
+  :Emite (LAB, label_fim, -, -);
+
+case (NODE_ITERACAO_DECL)
+  :Gera label_inicio e label_fim;
+  :Emite (LAB, label_inicio, -, -);
+  :Processa condicao com branch invertido;
+  :Processa corpo do loop;
+  :Emite (JUMP, label_inicio, -, -);
+  :Emite (LAB, label_fim, -, -);
+
+case (NODE_EXPRESSAO_REC)
+  :Processa lado direito;
+  :Emite (STORE, valor, var, -);
+
+case (NODE_SOMA/SUB/MULT/DIV)
+  :Processa operando 1 -> regA;
+  :Processa operando 2 -> regB;
+  :Aloca regC;
+  :Emite (OP, regA, regB, regC);
+  :Libera regA e regB;
+  :Retorna regC;
+
+case (NODE_ID)
+  :Aloca reg;
+  :Emite (LOAD, var, -, reg);
+  :Retorna reg;
+
+case (NODE_NUM)
+  :Aloca reg;
+  :Emite (LOADI, valor, -, reg);
+  :Retorna reg;
+
+case (NODE_VAR_DECLARACAO)
+  :Emite (ALLOC, var, escopo, -);
+
+endswitch
+
+:Retorna registrador ou "-";
+stop
+@enduml
