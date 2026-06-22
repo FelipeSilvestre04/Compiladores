@@ -89,6 +89,12 @@ module decoder_instrucao(
 						  4'b0001: begin // OUT rs1
 								rs1 <= instrucao[12:7]; // O campo é uma fonte
 						  end
+						  4'b0010: begin // STORE_STACK rs1 (Push)
+								rs1 <= instrucao[12:7]; // O campo é uma fonte
+						  end
+						  4'b0011: begin // LOAD_STACK rw (Pop)
+								rw <= instrucao[12:7];  // O campo é um destino
+						  end
 					 endcase
 				end
             

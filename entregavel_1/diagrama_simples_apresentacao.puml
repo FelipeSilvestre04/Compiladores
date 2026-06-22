@@ -1,0 +1,56 @@
+@startuml
+title Fluxo de Geração de Código - Compilador C-
+skinparam backgroundColor #FEFEFE
+skinparam activityBackgroundColor #E3F2FD
+skinparam activityBorderColor #1565C0
+
+|Inicialização|
+start
+:Limpa saida.quad e saida.asm;
+:Zera Tabela de Registradores;
+:Chama processa_arvore(Raiz_AST);
+
+|Navegação na AST|
+repeat
+  :Lê Nó da Árvore (AST);
+  
+  |Tradução (Geração de Quádruplas)|
+  switch (Tipo do Nó?)
+  case ( IF / WHILE )
+    :Gera Rótulos (Labels);
+    :Gera Branch Invertido da Condição;
+    :Processa bloco interno;
+    :Gera JUMP de desvio;
+  case ( FUNÇÃO )
+    :Gera Rótulo da Função;
+    :Desempilha Parâmetros (ARG);
+    :Salva Endereço de Retorno (SAVE_RA);
+    :Processa corpo da função;
+  case ( ATIVAÇÃO / CALL )
+    :Empilha Argumentos (Reverso);
+    :Gera CALL para a função;
+    :Aloca Registrador Temporário;
+  case ( MATEMÁTICA )
+    :Processa filho da Esquerda e Direita;
+    :Gera quádrupla (ADD/SUB/MULT/DIV);
+  endswitch
+
+  |Expansão (salvar_arquivo)|
+  fork
+    :Fase 1: Código Intermediário
+    Escreve a Quádrupla no arquivo saida.quad;
+  fork again
+    :Fase 2: Assembly Real
+    Expande para instruções MIPS/RISC-V
+    (ex: CALL vira JAL, SAVE_RA vira STORE_STACK)
+    e salva em saida.asm;
+  end fork
+
+|Navegação na AST|
+repeat while (Existem mais nós irmãos ou filhos?) is (Sim)
+-> Não;
+
+|Inicialização|
+:Fim da Compilação;
+stop
+@enduml

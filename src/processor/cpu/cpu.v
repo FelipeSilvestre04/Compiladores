@@ -55,6 +55,7 @@ module cpu (
     wire branch_taken;
     wire sinal_desvio, branch;
     wire clk;
+    wire STORE_STACK_en, LOAD_STACK_en; // <<< SINAIS DE PILHA
     
     // --- Sinais para Lógica de I/O ---
     wire        IN_signal;         
@@ -110,7 +111,9 @@ module cpu (
         .ALUop(ALUop), .MemWrite(MemWrite), .ALUSrc(ALUSrc), .RegWrite(RegWrite),
         .JR(JR), .JumpAbs(JumpAbs), .Halt(Halt),
         .WriteToIO(WriteToIO),
-        .IN_signal(IN_signal) 
+        .IN_signal(IN_signal),
+        .STORE_STACK_en(STORE_STACK_en),
+        .LOAD_STACK_en(LOAD_STACK_en)
     );
     
     assign switch_data = IN_signal ? switches : 18'b0;
@@ -145,9 +148,33 @@ module cpu (
         .rd(ula_result), .branch_taken(branch_taken)
     );
 
-    ram ram_inst (
-        .data(rs2_data), .read_addr(ula_result), .write_addr(ula_result),
-        .we(MemWrite), .clk(clk), .q(rd)
+    // --- Controle do Stack Pointer (SP) ---
+    reg [5:0] SP;
+    wire rst_high = ~rst; // KEYs da placa física são ativas em nível baixo
+
+    always @(posedge clk) begin
+        if (rst_high) begin
+            SP <= 6'd63; // Inicializa no topo da RAM
+        end else if (STORE_STACK_en) begin
+            SP <= SP - 6'd1;
+        end else if (LOAD_STACK_en) begin
+            SP <= SP + 6'd1;
+        end
+    end
+
+    // --- Multiplexadores da RAM Compartilhada ---
+    wire [5:0]  ram_read_addr  = (LOAD_STACK_en)  ? (SP + 6'd1) : ula_result[7:2];
+    wire [5:0]  ram_write_addr = (STORE_STACK_en) ? SP          : ula_result[7:2];
+    wire [31:0] ram_write_data = (STORE_STACK_en) ? rs1_data    : rs2_data;
+    wire        ram_we         = MemWrite | STORE_STACK_en;
+
+    ram #(.DATA_WIDTH(32), .ADDR_WIDTH(6)) ram_inst (
+        .data(ram_write_data),
+        .read_addr(ram_read_addr),
+        .write_addr(ram_write_addr),
+        .we(ram_we),
+        .clk(clk),
+        .q(rd)
     );
 
     mux_memoria mux_mem_inst (

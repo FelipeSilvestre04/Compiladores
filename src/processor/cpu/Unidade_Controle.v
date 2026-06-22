@@ -17,7 +17,9 @@ module Unidade_Controle(
 	 output reg       JumpAbs,
 	 output reg       Halt ,
 	 output reg       WriteToIO, // <<< NOVA SAÍDA
-	 output reg IN_signal
+	 output reg IN_signal,
+	 output reg STORE_STACK_en,
+	 output reg LOAD_STACK_en
     // O sinal MemRead foi omitido pois a RAM implementada lê de forma assíncrona sempre.
 );
 
@@ -36,6 +38,8 @@ module Unidade_Controle(
         Halt     = 1'b0;
         WriteToIO = 1'b0;
 		  IN_signal = 1'b0;
+        STORE_STACK_en = 1'b0;
+        LOAD_STACK_en = 1'b0;
         ALUop    = 4'bxxxx; // "Don't care" por padrão
 
         // Passo 2: Usa o opcode para determinar a classe da instrução.
@@ -163,6 +167,16 @@ module Unidade_Controle(
                     // OUT rs1
                     4'b0001: begin 
                         WriteToIO = 1'b1;     // Ativa o sinal da instrução OUT.
+                    end
+                    // STORE_STACK rs1 (Push)
+                    4'b0010: begin 
+                        STORE_STACK_en = 1'b1;
+                    end
+                    // LOAD_STACK rw (Pop)
+                    4'b0011: begin 
+                        LOAD_STACK_en = 1'b1;
+                        RegWrite = 1'b1;      // Habilita escrita no banco de registradores (destino rw)
+                        MemtoReg = 2'b01;     // O dado a ser escrito vem da memória RAM
                     end
                 endcase
             end

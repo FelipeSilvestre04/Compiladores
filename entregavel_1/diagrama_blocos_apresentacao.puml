@@ -1,0 +1,53 @@
+@startuml
+skinparam linetype ortho
+skinparam class {
+    BackgroundColor #FEFEFE
+    BorderColor #1565C0
+    HeaderBackgroundColor #E3F2FD
+}
+hide circle
+hide empty methods
+
+title Diagrama Lógico de Blocos (Fluxo Ascendente)
+
+class "1. Inicializador (iniciar_compilador)" as B1 {
+  * Cria/Limpa saida.quad
+  * Cria/Limpa saida.asm
+  * Inicializa vetor de registradores (64 pos)
+  * Dá o gatilho inicial
+}
+
+class "2. Processador Central (processa_arvore)" as B2 {
+  * Recebe a Árvore Sintática (AST)
+  * Avalia o tipo do nó via Switch-Case
+  * Define a lógica estrutural (If, While, Fun)
+  * Delega funções matemáticas e ativações
+}
+
+class "3. Auxiliares de Memória" as B3 {
+  * alocar_reg: Encontra livre
+  * liberar_reg: Devolve ao pool
+  * return_label: Cria rótulos (L0...)
+  * empilhar_parametros: Inverte LIFO
+}
+
+class "4. Roteador de Saída (salvar_arquivo)" as B4 {
+  * Intercepta a Quádrupla gerada
+  * Fase 1: Escreve no saida.quad
+  * Fase 2: Traduz para Assembly Real
+}
+
+class "5. Motor de Assembly" as B5 {
+  * Converte CALL (JAL, LOAD_STACK)
+  * Converte RET (LOAD_STACK, JR)
+  * Converte ARG/PARAM
+  * Escreve no arquivo saida.asm
+}
+
+' Setas indo para cima (-up->) e linhas ortogonais ("quadradas")
+B1 -up-> B2 : Inicia recursão
+B2 -right-> B3 : Requisita recursos
+B2 -up-> B4 : Envia Quádrupla (OP, A1, A2, R)
+B4 -up-> B5 : Delega Tradução
+
+@enduml
