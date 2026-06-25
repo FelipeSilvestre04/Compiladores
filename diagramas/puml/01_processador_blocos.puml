@@ -1,0 +1,54 @@
+@startuml
+title Diagrama de Blocos - Processador
+
+top to bottom direction
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #404040
+skinparam component {
+  BorderColor #404040
+  BackgroundColor #F7F7F7
+}
+skinparam rectangle {
+  BorderColor #404040
+  BackgroundColor #FFFFFF
+}
+
+rectangle "Busca e Decodificacao" {
+  rectangle "PC\nContador de Programa" as PC
+  rectangle "ROM de Instrucoes\nprograma.txt" as ROM
+  rectangle "Decodificador\nde Instrucao" as DEC
+}
+
+rectangle "Controle" {
+  rectangle "Unidade de\nControle" as UC
+  rectangle "Controle de Desvio\nbranch / jump / jal / jr" as CTRLPC
+}
+
+rectangle "Caminho de Dados" {
+  rectangle "Banco de\nRegistradores" as REG
+  rectangle "ULA" as ULA
+  rectangle "Memoria de Dados\nRAM" as RAM
+  rectangle "Unidade de Pilha\nSP interno" as STACK
+  rectangle "Entrada e Saida\nIN / OUT" as IO
+}
+
+PC -down-> ROM : endereco
+ROM -down-> DEC : instrucao
+DEC -down-> UC : campos decodificados
+
+UC -down-> REG : controle
+UC -right-> CTRLPC : fluxo
+CTRLPC -up-> PC : proximo PC
+
+REG -left-> ULA : operandos
+ULA -right-> REG : resultado
+
+REG -down-> RAM : load/store
+REG -down-> STACK : pilha
+REG -down-> IO : entrada/saida
+
+@enduml

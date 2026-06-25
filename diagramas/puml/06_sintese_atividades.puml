@@ -1,0 +1,42 @@
+@startuml
+title Diagrama de Atividades - Fase de Sintese do Compilador
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #404040
+
+start
+:Receber AST validada;
+:Inicializar tabelas de variaveis,\nregistradores temporarios e rotulos;
+
+:Percorrer nos da AST;
+:Classificar cada no visitado\ncomo expressao, comando, funcao,\nchamada ou acesso a vetor;
+:Gerar quadruplas correspondentes\nADD, LOAD, STORE, JUMP, LAB,\nFUN, ARG, PARAM, CALL, RET e END;
+
+:Salvar codigo intermediario\nem saida.quad;
+:Ler quadruplas geradas;
+
+repeat
+  :Selecionar regra de traducao\nda quadrupla atual;
+  if (quadrupla tem mapeamento direto?) then (sim)
+    :Emitir uma instrucao assembly;
+  else (nao)
+    :Expandir para sequencia de instrucoes\npilha, chamada, retorno ou vetor;
+  endif
+repeat while (existem quadruplas?) is (sim)
+
+:Resolver rotulos e enderecos de PC;
+:Salvar assembly em saida.asm;
+:Ler instrucoes assembly;
+
+repeat
+  :Identificar formato da instrucao\nR, I, J, B, N ou IO;
+  :Preencher campos opcode, funct,\nregistradores e imediato;
+  :Gerar palavra binaria de 32 bits;
+repeat while (existem instrucoes?) is (sim)
+
+:Salvar codigo executavel\nem programa.txt;
+stop
+@enduml

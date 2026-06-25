@@ -1,0 +1,44 @@
+@startuml
+title Diagrama de Blocos - Fase de Analise do Compilador
+
+top to bottom direction
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #404040
+skinparam component {
+  BorderColor #404040
+  BackgroundColor #F7F7F7
+}
+skinparam database {
+  BorderColor #404040
+  BackgroundColor #FFFFFF
+}
+
+artifact "Codigo-fonte C-" as SRC
+component "Analisador Lexico\nlexer.l" as LEX
+queue "Tokens" as TOK
+component "Analisador Sintatico\nparser.y" as PARSER
+component "Construcao da AST" as ASTGEN
+rectangle "Arvore Sintatica\nAbstrata (AST)" as AST
+component "Analisador Semantico" as SEM
+database "Tabela de Simbolos" as SYMTAB
+rectangle "AST validada" as VALID
+rectangle "Mensagens de Erro" as ERR
+
+SRC --> LEX : caracteres
+LEX --> TOK : tokens
+TOK --> PARSER : fluxo de tokens
+PARSER --> ASTGEN : reducoes da gramatica
+ASTGEN --> AST : nos da arvore
+AST --> SEM : percurso semantico
+SEM --> VALID : programa aceito
+
+SEM <--> SYMTAB : declaracoes,\nfuncoes e tipos
+LEX --> ERR : erros lexicos
+PARSER --> ERR : erros sintaticos
+SEM --> ERR : erros semanticos
+
+@enduml

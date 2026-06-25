@@ -1,0 +1,431 @@
+% Requer no preâmbulo: listings, longtable, booktabs e array.
+\chapter{Resultados e Testes}
+\label{chap:resultados}
+
+Neste capítulo, são apresentados os resultados práticos da compilação de três programas escritos em C-: o algoritmo de Euclides para cálculo do máximo divisor comum, o fatorial recursivo e o algoritmo de ordenação por seleção. Os exemplos demonstram o fluxo completo de compilação, incluindo a geração do código intermediário em quádruplas, a tradução para assembly e a codificação das instruções em palavras binárias de 32 bits.
+
+Em cada caso, o código-fonte é apresentado antes da tabela de correspondência. Em seguida, a tabela completa relaciona as quádruplas geradas, as instruções assembly correspondentes e o código binário produzido. As linhas de rótulo no assembly não possuem palavra binária associada, pois representam apenas endereços simbólicos resolvidos durante a geração do código executável.
+
+\section{Algoritmo de Euclides: Máximo Divisor Comum}
+\label{sec:res_gcd}
+
+O primeiro caso de teste é o algoritmo de Euclides, implementado com chamada recursiva. Esse exemplo exercita comandos condicionais, operações aritméticas, divisão inteira, chamada de função com dois argumentos, retorno de valor e comandos de entrada e saída.
+
+\subsection{Código-fonte}
+
+\begin{lstlisting}[language=C, caption={Código-fonte do algoritmo de Euclides para cálculo do MDC.}, label={lst:gcd_fonte}]
+/* Um programa para calcular o mdc
+   segundo o algoritmo de Euclides. */
+
+int gcd(int u, int v)
+{
+    if (v == 0)
+        return u;
+    else
+        return gcd(v, u - u / v * v);
+}
+
+void main(void)
+{
+    int x;
+    int y;
+
+    x = input();
+    y = input();
+
+    output(gcd(x, y));
+}
+\end{lstlisting}
+
+\subsection{Tabela de correspondência}
+
+\begin{center}
+\scriptsize
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.36\textwidth} >{\raggedright\arraybackslash}p{0.31\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth}}
+\caption{Tabela completa de correspondência do Algoritmo de Euclides (MDC)} \label{tab:gcd_res} \\
+\toprule
+\textbf{Quádruplas} & \textbf{Assembly (PC)} & \textbf{Código Binário (PC)} \\ \midrule
+\endfirsthead
+\multicolumn{3}{c}%
+{{\bfseries Tabela \thetable\ -- Continuação da página anterior}} \\
+\midrule
+\textbf{Quádruplas} & \textbf{Assembly (PC)} & \textbf{Código Binário (PC)} \\ \midrule
+\endhead
+\midrule \multicolumn{3}{r}{{Continua na próxima página}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+{\ttfamily 1:\ (JUMP,\ main,\ -,\ -)} & {\ttfamily 0:\ JUMP\ main} & {{\ttfamily 0:\ 0000000000000011 \newline \ \ \ 1000000000000010}} \\
+{\ttfamily 2:\ (FUN,\ int,\ gcd,\ -)} & {\ttfamily gcd:} & ~ \\
+{\ttfamily 3:\ (ARG,\ u,\ -,\ -)} & {\ttfamily 1:\ LOAD\_STACK\ \$at} & {{\ttfamily 1:\ 0000000000000000 \newline \ \ \ 0000000110011110}} \\
+{\ttfamily 4:\ (ARG,\ v,\ -,\ -)} & {\ttfamily 2:\ STORE\ \$at,\ u,\ 0} & {{\ttfamily 2:\ 0000000000000000 \newline \ \ \ 0000000110001001}} \\
+{\ttfamily 5:\ (LOAD,\ v,\ -,\ \$t0)} & {\ttfamily 3:\ LOAD\_STACK\ \$at} & {{\ttfamily 3:\ 0000000000000000 \newline \ \ \ 0000000110011110}} \\
+{\ttfamily 6:\ (LOADI,\ 0,\ -,\ \$t1)} & {\ttfamily 4:\ STORE\ \$at,\ v,\ 0} & {{\ttfamily 4:\ 0000000000100000 \newline \ \ \ 0000000110001001}} \\
+{\ttfamily 7:\ (BNE,\ \$t0,\ \$t1,\ L0)} & {\ttfamily 5:\ STORE\_STACK\ \$ra} & {{\ttfamily 5:\ 0000000000000000 \newline \ \ \ 0000000010010110}} \\
+{\ttfamily 8:\ (LOAD,\ u,\ -,\ \$t0)} & {\ttfamily 6:\ LOAD\ \$t0,\ v} & {{\ttfamily 6:\ 0000000000100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 9:\ (RET,\ \$t0,\ -,\ -)} & {\ttfamily 7:\ ADDI\ \$t1,\ \$zero,\ 0} & {{\ttfamily 7:\ 0000000000000000 \newline \ \ \ 0000001010010001}} \\
+{\ttfamily 10:\ (JUMP,\ L1,\ -,\ -)} & {\ttfamily 8:\ BNE\ \$t0,\ \$t1,\ L0} & {{\ttfamily 8:\ 0000000000101000 \newline \ \ \ 1010001000001011}} \\
+{\ttfamily 11:\ (LAB,\ L0,\ -,\ -)} & {\ttfamily 9:\ LOAD\ \$t0,\ u} & {{\ttfamily 9:\ 0000000000000000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 12:\ (LOAD,\ u,\ -,\ \$t0)} & {\ttfamily 10:\ LOAD\_STACK\ \$ra} & {{\ttfamily 10:\ 0000000000000000 \newline \ \ \ \ 0000000010011110}} \\
+{\ttfamily 13:\ (LOAD,\ u,\ -,\ \$t1)} & {\ttfamily 11:\ STORE\_STACK\ \$t0} & {{\ttfamily 11:\ 0000000000000000 \newline \ \ \ \ 0000001000010110}} \\
+{\ttfamily 14:\ (LOAD,\ v,\ -,\ \$t2)} & {\ttfamily 12:\ JR\ \$ra} & {{\ttfamily 12:\ 0000000000000000 \newline \ \ \ \ 0000000010001010}} \\
+{\ttfamily 15:\ (DIV,\ \$t1,\ \$t2,\ \$t3)} & {\ttfamily 13:\ JUMP\ L1} & {{\ttfamily 13:\ 0000000000000001 \newline \ \ \ \ 1110000000000010}} \\
+{\ttfamily 16:\ (LOAD,\ v,\ -,\ \$t1)} & {\ttfamily L0:} & ~ \\
+{\ttfamily 17:\ (MULT,\ \$t3,\ \$t1,\ \$t2)} & {\ttfamily 14:\ LOAD\ \$t0,\ u} & {{\ttfamily 14:\ 0000000000000000 \newline \ \ \ \ 0000001000000001}} \\
+{\ttfamily 18:\ (SUB,\ \$t0,\ \$t2,\ \$t1)} & {\ttfamily 15:\ LOAD\ \$t1,\ u} & {{\ttfamily 15:\ 0000000000000000 \newline \ \ \ \ 0000001010000001}} \\
+{\ttfamily 19:\ (PARAM,\ \$t1,\ -,\ -)} & {\ttfamily 16:\ LOAD\ \$t2,\ v} & {{\ttfamily 16:\ 0000000000100000 \newline \ \ \ \ 0000001100000001}} \\
+{\ttfamily 20:\ (LOAD,\ v,\ -,\ \$t0)} & {\ttfamily 17:\ DIV\ \$t3,\ \$t1,\ \$t2} & {{\ttfamily 17:\ 0000000000110000 \newline \ \ \ \ 1010001110011000}} \\
+{\ttfamily 21:\ (PARAM,\ \$t0,\ -,\ -)} & {\ttfamily 18:\ LOAD\ \$t1,\ v} & {{\ttfamily 18:\ 0000000000100000 \newline \ \ \ \ 0000001010000001}} \\
+{\ttfamily 22:\ (CALL,\ gcd,\ 2,\ \$t0)} & {\ttfamily 19:\ MULT\ \$t2,\ \$t3,\ \$t1} & {{\ttfamily 19:\ 0000000000101000 \newline \ \ \ \ 1110001100010000}} \\
+{\ttfamily 23:\ (RET,\ \$t0,\ -,\ -)} & {\ttfamily 20:\ SUB\ \$t1,\ \$t0,\ \$t2} & {{\ttfamily 20:\ 0000000000110000 \newline \ \ \ \ 1000001010001000}} \\
+{\ttfamily 24:\ (LAB,\ L1,\ -,\ -)} & {\ttfamily 21:\ STORE\_STACK\ \$t1} & {{\ttfamily 21:\ 0000000000000000 \newline \ \ \ \ 0000001010010110}} \\
+{\ttfamily 25:\ (END,\ gcd,\ -,\ -)} & {\ttfamily 22:\ LOAD\ \$t0,\ v} & {{\ttfamily 22:\ 0000000000100000 \newline \ \ \ \ 0000001000000001}} \\
+{\ttfamily 26:\ (FUN,\ int,\ main,\ -)} & {\ttfamily 23:\ STORE\_STACK\ \$t0} & {{\ttfamily 23:\ 0000000000000000 \newline \ \ \ \ 0000001000010110}} \\
+{\ttfamily 27:\ (IN,\ -,\ -,\ \$t0)} & {\ttfamily 24:\ JAL\ \$ra,\ gcd} & {{\ttfamily 24:\ 1111111111111101 \newline \ \ \ \ 0000000010010010}} \\
+{\ttfamily 28:\ (STORE,\ \$t0,\ x,\ -)} & {\ttfamily 25:\ LOAD\_STACK\ \$t0} & {{\ttfamily 25:\ 0000000000000000 \newline \ \ \ \ 0000001000011110}} \\
+{\ttfamily 29:\ (IN,\ -,\ -,\ \$t0)} & {\ttfamily 26:\ LOAD\_STACK\ \$ra} & {{\ttfamily 26:\ 0000000000000000 \newline \ \ \ \ 0000000010011110}} \\
+{\ttfamily 30:\ (STORE,\ \$t0,\ y,\ -)} & {\ttfamily 27:\ STORE\_STACK\ \$t0} & {{\ttfamily 27:\ 0000000000000000 \newline \ \ \ \ 0000001000010110}} \\
+{\ttfamily 31:\ (LOAD,\ y,\ -,\ \$t0)} & {\ttfamily 28:\ JR\ \$ra} & {{\ttfamily 28:\ 0000000000000000 \newline \ \ \ \ 0000000010001010}} \\
+{\ttfamily 32:\ (PARAM,\ \$t0,\ -,\ -)} & {\ttfamily L1:} & ~ \\
+{\ttfamily 33:\ (LOAD,\ x,\ -,\ \$t0)} & {\ttfamily main:} & ~ \\
+{\ttfamily 34:\ (PARAM,\ \$t0,\ -,\ -)} & {\ttfamily 29:\ STORE\_STACK\ \$ra} & {{\ttfamily 29:\ 0000000000000000 \newline \ \ \ \ 0000000010010110}} \\
+{\ttfamily 35:\ (CALL,\ gcd,\ 2,\ \$t0)} & {\ttfamily 30:\ IN\ \$t0} & {{\ttfamily 30:\ 0000000000000000 \newline \ \ \ \ 0000001000000110}} \\
+{\ttfamily 36:\ (OUT,\ \$t0,\ -,\ -)} & {\ttfamily 31:\ STORE\ -,\ \$t0,\ x} & {{\ttfamily 31:\ 0000000001000000 \newline \ \ \ \ 0000001000001001}} \\
+{\ttfamily 37:\ (END,\ main,\ -,\ -)} & {\ttfamily 32:\ IN\ \$t0} & {{\ttfamily 32:\ 0000000000000000 \newline \ \ \ \ 0000001000000110}} \\
+{\ttfamily 38:\ (HALT,\ -,\ -,\ -)} & {\ttfamily 33:\ STORE\ -,\ \$t0,\ y} & {{\ttfamily 33:\ 0000000001100000 \newline \ \ \ \ 0000001000001001}} \\
+~ & {\ttfamily 34:\ LOAD\ \$t0,\ y} & {{\ttfamily 34:\ 0000000001100000 \newline \ \ \ \ 0000001000000001}} \\
+~ & {\ttfamily 35:\ STORE\_STACK\ \$t0} & {{\ttfamily 35:\ 0000000000000000 \newline \ \ \ \ 0000001000010110}} \\
+~ & {\ttfamily 36:\ LOAD\ \$t0,\ x} & {{\ttfamily 36:\ 0000000001000000 \newline \ \ \ \ 0000001000000001}} \\
+~ & {\ttfamily 37:\ STORE\_STACK\ \$t0} & {{\ttfamily 37:\ 0000000000000000 \newline \ \ \ \ 0000001000010110}} \\
+~ & {\ttfamily 38:\ JAL\ \$ra,\ gcd} & {{\ttfamily 38:\ 1111111111111011 \newline \ \ \ \ 0100000010010010}} \\
+~ & {\ttfamily 39:\ LOAD\_STACK\ \$t0} & {{\ttfamily 39:\ 0000000000000000 \newline \ \ \ \ 0000001000011110}} \\
+~ & {\ttfamily 40:\ OUT\ \$t0} & {{\ttfamily 40:\ 0000000000000000 \newline \ \ \ \ 0000001000001110}} \\
+~ & {\ttfamily 41:\ HALT\ -} & {{\ttfamily 41:\ 0000000000000000 \newline \ \ \ \ 0000000000001100}} \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\subsection{Análise comparativa}
+
+No algoritmo de Euclides, as quádruplas de comparação e desvio representam a condição de parada da recursão. A expressão \texttt{u - u / v * v} é decomposta em operações intermediárias de divisão, multiplicação e subtração. A chamada recursiva é representada por quádruplas de passagem de parâmetro e chamada de função, que são traduzidas para instruções de pilha e para a instrução \texttt{JAL}. O retorno utiliza \texttt{LOAD\_STACK}, \texttt{STORE\_STACK} e \texttt{JR} para restaurar o endereço de retorno e disponibilizar o valor calculado.
+
+\newpage
+\section{Algoritmo de Fatorial Recursivo}
+\label{sec:res_fact}
+
+O segundo caso de teste é o fatorial recursivo. Esse exemplo exercita comando condicional, chamada recursiva com um argumento, subtração, multiplicação, retorno de valor e comandos de entrada e saída.
+
+\subsection{Código-fonte}
+
+\begin{lstlisting}[language=C, caption={Código-fonte do algoritmo de fatorial recursivo.}, label={lst:fact_fonte}]
+int fact(int n)
+{
+    if (n <= 0) {
+        return 1;
+    }
+
+    return n * fact(n - 1);
+}
+
+void main(void)
+{
+    int n;
+
+    n = input();
+    output(fact(n));
+}
+\end{lstlisting}
+
+\subsection{Tabela de correspondência}
+
+\begin{center}
+\scriptsize
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.36\textwidth} >{\raggedright\arraybackslash}p{0.31\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth}}
+\caption{Tabela completa de correspondência do Algoritmo de Fatorial Recursivo} \label{tab:fact_res} \\
+\toprule
+\textbf{Quádruplas} & \textbf{Assembly (PC)} & \textbf{Código Binário (PC)} \\ \midrule
+\endfirsthead
+\multicolumn{3}{c}%
+{{\bfseries Tabela \thetable\ -- Continuação da página anterior}} \\
+\midrule
+\textbf{Quádruplas} & \textbf{Assembly (PC)} & \textbf{Código Binário (PC)} \\ \midrule
+\endhead
+\midrule \multicolumn{3}{r}{{Continua na próxima página}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+{\ttfamily 1:\ (JUMP,\ main,\ -,\ -)} & {\ttfamily 0:\ JUMP\ main} & {{\ttfamily 0:\ 0000000000000010 \newline \ \ \ 1100000000000010}} \\
+{\ttfamily 2:\ (FUN,\ int,\ fact,\ -)} & {\ttfamily fact:} & ~ \\
+{\ttfamily 3:\ (ARG,\ n,\ -,\ -)} & {\ttfamily 1:\ LOAD\_STACK\ \$at} & {{\ttfamily 1:\ 0000000000000000 \newline \ \ \ 0000000110011110}} \\
+{\ttfamily 4:\ (LOAD,\ n,\ -,\ \$t0)} & {\ttfamily 2:\ STORE\ \$at,\ n,\ 0} & {{\ttfamily 2:\ 0000000000000000 \newline \ \ \ 0000000110001001}} \\
+{\ttfamily 5:\ (LOADI,\ 0,\ -,\ \$t1)} & {\ttfamily 3:\ STORE\_STACK\ \$ra} & {{\ttfamily 3:\ 0000000000000000 \newline \ \ \ 0000000010010110}} \\
+{\ttfamily 6:\ (BGT,\ \$t0,\ \$t1,\ L0)} & {\ttfamily 4:\ LOAD\ \$t0,\ n} & {{\ttfamily 4:\ 0000000000000000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 7:\ (LOADI,\ 1,\ -,\ \$t0)} & {\ttfamily 5:\ ADDI\ \$t1,\ \$zero,\ 0} & {{\ttfamily 5:\ 0000000000000000 \newline \ \ \ 0000001010010001}} \\
+{\ttfamily 8:\ (RET,\ \$t0,\ -,\ -)} & {\ttfamily 6:\ BGT\ \$t0,\ \$t1,\ L0} & {{\ttfamily 6:\ 0000000000101000 \newline \ \ \ 1010001000100011}} \\
+{\ttfamily 9:\ (JUMP,\ L1,\ -,\ -)} & {\ttfamily 7:\ ADDI\ \$t0,\ \$zero,\ 1} & {{\ttfamily 7:\ 0000000000001000 \newline \ \ \ 0000001000010001}} \\
+{\ttfamily 10:\ (LAB,\ L0,\ -,\ -)} & {\ttfamily 8:\ LOAD\_STACK\ \$ra} & {{\ttfamily 8:\ 0000000000000000 \newline \ \ \ 0000000010011110}} \\
+{\ttfamily 11:\ (LAB,\ L1,\ -,\ -)} & {\ttfamily 9:\ STORE\_STACK\ \$t0} & {{\ttfamily 9:\ 0000000000000000 \newline \ \ \ 0000001000010110}} \\
+{\ttfamily 12:\ (LOAD,\ n,\ -,\ \$t0)} & {\ttfamily 10:\ JR\ \$ra} & {{\ttfamily 10:\ 0000000000000000 \newline \ \ \ \ 0000000010001010}} \\
+{\ttfamily 13:\ (LOAD,\ n,\ -,\ \$t1)} & {\ttfamily 11:\ JUMP\ L1} & {{\ttfamily 11:\ 0000000000000000 \newline \ \ \ \ 0000000000000010}} \\
+{\ttfamily 14:\ (LOADI,\ 1,\ -,\ \$t2)} & {\ttfamily L0:} & ~ \\
+{\ttfamily 15:\ (SUB,\ \$t1,\ \$t2,\ \$t3)} & {\ttfamily L1:} & ~ \\
+{\ttfamily 16:\ (PARAM,\ \$t3,\ -,\ -)} & {\ttfamily 12:\ LOAD\ \$t0,\ n} & {{\ttfamily 12:\ 0000000000000000 \newline \ \ \ \ 0000001000000001}} \\
+{\ttfamily 17:\ (CALL,\ fact,\ 1,\ \$t1)} & {\ttfamily 13:\ LOAD\ \$t1,\ n} & {{\ttfamily 13:\ 0000000000000000 \newline \ \ \ \ 0000001010000001}} \\
+{\ttfamily 18:\ (MULT,\ \$t0,\ \$t1,\ \$t2)} & {\ttfamily 14:\ ADDI\ \$t2,\ \$zero,\ 1} & {{\ttfamily 14:\ 0000000000001000 \newline \ \ \ \ 0000001100010001}} \\
+{\ttfamily 19:\ (RET,\ \$t2,\ -,\ -)} & {\ttfamily 15:\ SUB\ \$t3,\ \$t1,\ \$t2} & {{\ttfamily 15:\ 0000000000110000 \newline \ \ \ \ 1010001110001000}} \\
+{\ttfamily 20:\ (END,\ fact,\ -,\ -)} & {\ttfamily 16:\ STORE\_STACK\ \$t3} & {{\ttfamily 16:\ 0000000000000000 \newline \ \ \ \ 0000001110010110}} \\
+{\ttfamily 21:\ (FUN,\ int,\ main,\ -)} & {\ttfamily 17:\ JAL\ \$ra,\ fact} & {{\ttfamily 17:\ 1111111111111101 \newline \ \ \ \ 1110000010010010}} \\
+{\ttfamily 22:\ (IN,\ -,\ -,\ \$t0)} & {\ttfamily 18:\ LOAD\_STACK\ \$t1} & {{\ttfamily 18:\ 0000000000000000 \newline \ \ \ \ 0000001010011110}} \\
+{\ttfamily 23:\ (STORE,\ \$t0,\ n,\ -)} & {\ttfamily 19:\ MULT\ \$t2,\ \$t0,\ \$t1} & {{\ttfamily 19:\ 0000000000101000 \newline \ \ \ \ 1000001100010000}} \\
+{\ttfamily 24:\ (LOAD,\ n,\ -,\ \$t0)} & {\ttfamily 20:\ LOAD\_STACK\ \$ra} & {{\ttfamily 20:\ 0000000000000000 \newline \ \ \ \ 0000000010011110}} \\
+{\ttfamily 25:\ (PARAM,\ \$t0,\ -,\ -)} & {\ttfamily 21:\ STORE\_STACK\ \$t2} & {{\ttfamily 21:\ 0000000000000000 \newline \ \ \ \ 0000001100010110}} \\
+{\ttfamily 26:\ (CALL,\ fact,\ 1,\ \$t0)} & {\ttfamily 22:\ JR\ \$ra} & {{\ttfamily 22:\ 0000000000000000 \newline \ \ \ \ 0000000010001010}} \\
+{\ttfamily 27:\ (OUT,\ \$t0,\ -,\ -)} & {\ttfamily main:} & ~ \\
+{\ttfamily 28:\ (END,\ main,\ -,\ -)} & {\ttfamily 23:\ STORE\_STACK\ \$ra} & {{\ttfamily 23:\ 0000000000000000 \newline \ \ \ \ 0000000010010110}} \\
+{\ttfamily 29:\ (HALT,\ -,\ -,\ -)} & {\ttfamily 24:\ IN\ \$t0} & {{\ttfamily 24:\ 0000000000000000 \newline \ \ \ \ 0000001000000110}} \\
+~ & {\ttfamily 25:\ STORE\ -,\ \$t0,\ n} & {{\ttfamily 25:\ 0000000000000000 \newline \ \ \ \ 0000001000001001}} \\
+~ & {\ttfamily 26:\ LOAD\ \$t0,\ n} & {{\ttfamily 26:\ 0000000000000000 \newline \ \ \ \ 0000001000000001}} \\
+~ & {\ttfamily 27:\ STORE\_STACK\ \$t0} & {{\ttfamily 27:\ 0000000000000000 \newline \ \ \ \ 0000001000010110}} \\
+~ & {\ttfamily 28:\ JAL\ \$ra,\ fact} & {{\ttfamily 28:\ 1111111111111100 \newline \ \ \ \ 1000000010010010}} \\
+~ & {\ttfamily 29:\ LOAD\_STACK\ \$t0} & {{\ttfamily 29:\ 0000000000000000 \newline \ \ \ \ 0000001000011110}} \\
+~ & {\ttfamily 30:\ OUT\ \$t0} & {{\ttfamily 30:\ 0000000000000000 \newline \ \ \ \ 0000001000001110}} \\
+~ & {\ttfamily 31:\ HALT\ -} & {{\ttfamily 31:\ 0000000000000000 \newline \ \ \ \ 0000000000001100}} \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\subsection{Análise comparativa}
+
+No fatorial recursivo, a condição \texttt{n <= 0} é traduzida para uma comparação seguida de desvio condicional. O caso base gera o carregamento imediato do valor \texttt{1} e o retorno da função. No caso recursivo, o compilador gera a subtração \texttt{n - 1}, empilha o argumento, realiza a chamada para \texttt{fact} e utiliza o valor retornado na multiplicação final. As instruções de pilha preservam o endereço de retorno e permitem que cada ativação da função mantenha seu próprio fluxo de execução.
+
+\newpage
+\section{Algoritmo de Ordenação: Selection Sort}
+\label{sec:res_sort}
+
+O terceiro caso de teste é o algoritmo de ordenação por seleção. Esse exemplo exercita vetor global, passagem de vetor como parâmetro, acesso indexado à memória, laços de repetição, chamada de função, variáveis locais e comandos de entrada e saída.
+
+\subsection{Código-fonte}
+
+\begin{lstlisting}[language=C, caption={Código-fonte do algoritmo de ordenação por seleção.}, label={lst:sort_fonte}]
+/* programa para ordenacao por selecao de
+   uma matriz com dez elementos. */
+
+int vet[10];
+
+int minloc(int a[], int low, int high)
+{
+    int i;
+    int x;
+    int k;
+
+    k = low;
+    x = a[low];
+    i = low + 1;
+
+    while (i < high) {
+        if (a[i] < x) {
+            x = a[i];
+            k = i;
+        }
+
+        i = i + 1;
+    }
+
+    return k;
+}
+
+void sort(int a[], int low, int high)
+{
+    int i;
+    int k;
+
+    i = low;
+
+    while (i < high - 1) {
+        int t;
+
+        k = minloc(a, i, high);
+        t = a[k];
+        a[k] = a[i];
+        a[i] = t;
+        i = i + 1;
+    }
+}
+
+void main(void)
+{
+    int i;
+
+    i = 0;
+
+    while (i < 10) {
+        vet[i] = input();
+        i = i + 1;
+    }
+
+    sort(vet, 0, 10);
+
+    i = 0;
+
+    while (i < 10) {
+        output(vet[i]);
+        i = i + 1;
+    }
+}
+\end{lstlisting}
+
+\subsection{Tabela de correspondência}
+
+\begin{center}
+\scriptsize
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.36\textwidth} >{\raggedright\arraybackslash}p{0.31\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth}}
+\caption{Tabela comparativa do Algoritmo de Selection Sort} \label{tab:sort_res} \\
+\toprule
+\textbf{Quádruplas} & \textbf{Assembly (PC)} & \textbf{Código Binário (PC)} \\ \midrule
+\endfirsthead
+\multicolumn{3}{c}%
+{{\bfseries Tabela \thetable\ -- Continuação da página anterior}} \\
+\midrule
+\textbf{Quádruplas} & \textbf{Assembly (PC)} & \textbf{Código Binário (PC)} \\ \midrule
+\endhead
+\midrule \multicolumn{3}{r}{{Continua na próxima página}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+{\ttfamily 1:\ (JUMP,\ main,\ -,\ -)} & {\ttfamily 0:\ JUMP\ main} & {{\ttfamily 0:\ 0000000000001011 \newline \ \ \ 0100000000000010}} \\
+{\ttfamily 2:\ (FUN,\ int,\ minloc,\ -)} & {\ttfamily minloc:} & ~ \\
+{\ttfamily 3:\ (ARG,\ a,\ -,\ -)} & {\ttfamily 1:\ LOAD\_STACK\ \$at} & {{\ttfamily 1:\ 0000000000000000 \newline \ \ \ 0000000110011110}} \\
+{\ttfamily 4:\ (ARG,\ low,\ -,\ -)} & {\ttfamily 2:\ STORE\ \$at,\ a,\ 0} & {{\ttfamily 2:\ 0000000101000000 \newline \ \ \ 0000000110001001}} \\
+{\ttfamily 5:\ (ARG,\ high,\ -,\ -)} & {\ttfamily 3:\ LOAD\_STACK\ \$at} & {{\ttfamily 3:\ 0000000000000000 \newline \ \ \ 0000000110011110}} \\
+{\ttfamily 6:\ (LOAD,\ low,\ -,\ \$t0)} & {\ttfamily 4:\ STORE\ \$at,\ low,\ 0} & {{\ttfamily 4:\ 0000000101100000 \newline \ \ \ 0000000110001001}} \\
+{\ttfamily 7:\ (STORE,\ \$t0,\ k,\ -)} & {\ttfamily 5:\ LOAD\_STACK\ \$at} & {{\ttfamily 5:\ 0000000000000000 \newline \ \ \ 0000000110011110}} \\
+{\ttfamily 8:\ (LOAD,\ low,\ -,\ \$t0)} & {\ttfamily 6:\ STORE\ \$at,\ high,\ 0} & {{\ttfamily 6:\ 0000000110000000 \newline \ \ \ 0000000110001001}} \\
+{\ttfamily 9:\ (LOAD,\ a,\ \$t0,\ \$t1)} & {\ttfamily 7:\ STORE\_STACK\ \$ra} & {{\ttfamily 7:\ 0000000000000000 \newline \ \ \ 0000000010010110}} \\
+{\ttfamily 10:\ (STORE,\ \$t1,\ x,\ -)} & {\ttfamily 8:\ LOAD\ \$t0,\ low} & {{\ttfamily 8:\ 0000000101100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 11:\ (LOAD,\ low,\ -,\ \$t0)} & {\ttfamily 9:\ STORE\ -,\ \$t0,\ k} & {{\ttfamily 9:\ 0000000111100000 \newline \ \ \ 0000001000001001}} \\
+{\ttfamily 12:\ (LOADI,\ 1,\ -,\ \$t1)} & {\ttfamily 10:\ LOAD\ \$t0,\ low} & {{\ttfamily 10:\ 0000000101100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 13:\ (ADD,\ \$t0,\ \$t1,\ \$t2)} & {\ttfamily 11:\ LOAD\ \$t1,\ a,\ \$t0} & {{\ttfamily 11:\ 0000000101000000 \newline \ \ \ 0000001010010001 \newline \ \ \ \ 12:\ 0000000000100000 \newline \ \ \ \ 1010001010000000 \newline \ \ \ \ 13:\ 0000000000000000 \newline \ \ \ \ 1010001010000001}} \\
+{\ttfamily 14:\ (STORE,\ \$t2,\ i,\ -)} & {\ttfamily 14:\ STORE\ -,\ \$t1,\ x} & {{\ttfamily 14:\ 0000000111000000 \newline \ \ \ 0000001010001001}} \\
+{\ttfamily 15:\ (LAB,\ L0,\ -,\ -)} & {\ttfamily 15:\ LOAD\ \$t0,\ low} & {{\ttfamily 15:\ 0000000101100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 16:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily 16:\ ADDI\ \$t1,\ \$zero,\ 1} & {{\ttfamily 16:\ 0000000000001000 \newline \ \ \ 0000001010010001}} \\
+{\ttfamily 17:\ (LOAD,\ high,\ -,\ \$t1)} & {\ttfamily 17:\ ADD\ \$t2,\ \$t0,\ \$t1} & {{\ttfamily 17:\ 0000000000101000 \newline \ \ \ 1000001100000000}} \\
+{\ttfamily 18:\ (BGE,\ \$t0,\ \$t1,\ L1)} & {\ttfamily 18:\ STORE\ -,\ \$t2,\ i} & {{\ttfamily 18:\ 0000000110100000 \newline \ \ \ 0000001100001001}} \\
+{\ttfamily 19:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily L0:} & ~ \\
+{\ttfamily 20:\ (LOAD,\ a,\ \$t0,\ \$t1)} & {\ttfamily 19:\ LOAD\ \$t0,\ i} & {{\ttfamily 19:\ 0000000110100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 21:\ (LOAD,\ x,\ -,\ \$t0)} & {\ttfamily 20:\ LOAD\ \$t1,\ high} & {{\ttfamily 20:\ 0000000110000000 \newline \ \ \ 0000001010000001}} \\
+{\ttfamily 22:\ (BGE,\ \$t1,\ \$t0,\ L2)} & {\ttfamily 21:\ BGE\ \$t0,\ \$t1,\ L1} & {{\ttfamily 21:\ 0000000010011000 \newline \ \ \ 1010001000101011}} \\
+{\ttfamily 23:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily 22:\ LOAD\ \$t0,\ i} & {{\ttfamily 22:\ 0000000110100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 24:\ (LOAD,\ a,\ \$t0,\ \$t1)} & {\ttfamily 23:\ LOAD\ \$t1,\ a,\ \$t0} & {{\ttfamily 23:\ 0000000101000000 \newline \ \ \ 0000001010010001 \newline \ \ \ \ 24:\ 0000000000100000 \newline \ \ \ \ 1010001010000000 \newline \ \ \ \ 25:\ 0000000000000000 \newline \ \ \ \ 1010001010000001}} \\
+{\ttfamily 25:\ (STORE,\ \$t1,\ x,\ -)} & {\ttfamily 26:\ LOAD\ \$t0,\ x} & {{\ttfamily 26:\ 0000000111000000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 26:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily 27:\ BGE\ \$t1,\ \$t0,\ L2} & {{\ttfamily 27:\ 0000000001000000 \newline \ \ \ 1000001010101011}} \\
+{\ttfamily 27:\ (STORE,\ \$t0,\ k,\ -)} & {\ttfamily 28:\ LOAD\ \$t0,\ i} & {{\ttfamily 28:\ 0000000110100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 28:\ (JUMP,\ L3,\ -,\ -)} & {\ttfamily 29:\ LOAD\ \$t1,\ a,\ \$t0} & {{\ttfamily 29:\ 0000000101000000 \newline \ \ \ 0000001010010001 \newline \ \ \ \ 30:\ 0000000000100000 \newline \ \ \ \ 1010001010000000 \newline \ \ \ \ 31:\ 0000000000000000 \newline \ \ \ \ 1010001010000001}} \\
+{\ttfamily 29:\ (LAB,\ L2,\ -,\ -)} & {\ttfamily 32:\ STORE\ -,\ \$t1,\ x} & {{\ttfamily 32:\ 0000000111000000 \newline \ \ \ 0000001010001001}} \\
+{\ttfamily 30:\ (LAB,\ L3,\ -,\ -)} & {\ttfamily 33:\ LOAD\ \$t0,\ i} & {{\ttfamily 33:\ 0000000110100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 31:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily 34:\ STORE\ -,\ \$t0,\ k} & {{\ttfamily 34:\ 0000000111100000 \newline \ \ \ 0000001000001001}} \\
+{\ttfamily 32:\ (LOADI,\ 1,\ -,\ \$t1)} & {\ttfamily 35:\ JUMP\ L3} & {{\ttfamily 35:\ 0000000000000000 \newline \ \ \ 0000000000000010}} \\
+{\ttfamily 33:\ (ADD,\ \$t0,\ \$t1,\ \$t2)} & {\ttfamily L2:} & ~ \\
+{\ttfamily 34:\ (STORE,\ \$t2,\ i,\ -)} & {\ttfamily L3:} & ~ \\
+{\ttfamily 35:\ (JUMP,\ L0,\ -,\ -)} & {\ttfamily 36:\ LOAD\ \$t0,\ i} & {{\ttfamily 36:\ 0000000110100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 36:\ (LAB,\ L1,\ -,\ -)} & {\ttfamily 37:\ ADDI\ \$t1,\ \$zero,\ 1} & {{\ttfamily 37:\ 0000000000001000 \newline \ \ \ 0000001010010001}} \\
+{\ttfamily 37:\ (LOAD,\ k,\ -,\ \$t0)} & {\ttfamily 38:\ ADD\ \$t2,\ \$t0,\ \$t1} & {{\ttfamily 38:\ 0000000000101000 \newline \ \ \ 1000001100000000}} \\
+{\ttfamily 38:\ (RET,\ \$t0,\ -,\ -)} & {\ttfamily 39:\ STORE\ -,\ \$t2,\ i} & {{\ttfamily 39:\ 0000000110100000 \newline \ \ \ 0000001100001001}} \\
+{\ttfamily 39:\ (END,\ minloc,\ -,\ -)} & {\ttfamily 40:\ JUMP\ L0} & {{\ttfamily 40:\ 1111111111111101 \newline \ \ \ 0100000000000010}} \\
+{\ttfamily 40:\ (FUN,\ int,\ sort,\ -)} & {\ttfamily L1:} & ~ \\
+{\ttfamily 41:\ (ARG,\ a,\ -,\ -)} & {\ttfamily 41:\ LOAD\ \$t0,\ k} & {{\ttfamily 41:\ 0000000111100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 42:\ (ARG,\ low,\ -,\ -)} & {\ttfamily 42:\ LOAD\_STACK\ \$ra} & {{\ttfamily 42:\ 0000000000000000 \newline \ \ \ 0000000010011110}} \\
+{\ttfamily 43:\ (ARG,\ high,\ -,\ -)} & {\ttfamily 43:\ STORE\_STACK\ \$t0} & {{\ttfamily 43:\ 0000000000000000 \newline \ \ \ 0000001000010110}} \\
+{\ttfamily 44:\ (LOAD,\ low,\ -,\ \$t0)} & {\ttfamily 44:\ JR\ \$ra} & {{\ttfamily 44:\ 0000000000000000 \newline \ \ \ \ 0000000010001010}} \\
+{\ttfamily 45:\ (STORE,\ \$t0,\ i,\ -)} & {\ttfamily sort:} & ~ \\
+{\ttfamily 46:\ (LAB,\ L4,\ -,\ -)} & {\ttfamily 45:\ LOAD\_STACK\ \$at} & {{\ttfamily 45:\ 0000000000000000 \newline \ \ \ 0000000110011110}} \\
+{\ttfamily 47:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily 46:\ STORE\ \$at,\ a,\ 0} & {{\ttfamily 46:\ 0000000101000000 \newline \ \ \ 0000000110001001}} \\
+{\ttfamily 48:\ (LOAD,\ high,\ -,\ \$t1)} & {\ttfamily 47:\ LOAD\_STACK\ \$at} & {{\ttfamily 47:\ 0000000000000000 \newline \ \ \ 0000000110011110}} \\
+{\ttfamily 49:\ (LOADI,\ 1,\ -,\ \$t2)} & {\ttfamily 48:\ STORE\ \$at,\ low,\ 0} & {{\ttfamily 48:\ 0000000101100000 \newline \ \ \ 0000000110001001}} \\
+{\ttfamily 50:\ (SUB,\ \$t1,\ \$t2,\ \$t3)} & {\ttfamily 49:\ LOAD\_STACK\ \$at} & {{\ttfamily 49:\ 0000000000000000 \newline \ \ \ 0000000110011110}} \\
+{\ttfamily 51:\ (BGE,\ \$t0,\ \$t3,\ L5)} & {\ttfamily 50:\ STORE\ \$at,\ high,\ 0} & {{\ttfamily 50:\ 0000000110000000 \newline \ \ \ 0000000110001001}} \\
+{\ttfamily 52:\ (LOAD,\ high,\ -,\ \$t0)} & {\ttfamily 51:\ STORE\_STACK\ \$ra} & {{\ttfamily 51:\ 0000000000000000 \newline \ \ \ 0000000010010110}} \\
+{\ttfamily 53:\ (PARAM,\ \$t0,\ -,\ -)} & {\ttfamily 52:\ LOAD\ \$t0,\ low} & {{\ttfamily 52:\ 0000000101100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 54:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily 53:\ STORE\ -,\ \$t0,\ i} & {{\ttfamily 53:\ 0000000110100000 \newline \ \ \ 0000001000001001}} \\
+{\ttfamily 55:\ (PARAM,\ \$t0,\ -,\ -)} & {\ttfamily L4:} & ~ \\
+{\ttfamily 56:\ (LOAD,\ a,\ -,\ \$t0)} & {\ttfamily 54:\ LOAD\ \$t0,\ i} & {{\ttfamily 54:\ 0000000110100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 57:\ (PARAM,\ \$t0,\ -,\ -)} & {\ttfamily 55:\ LOAD\ \$t1,\ high} & {{\ttfamily 55:\ 0000000110000000 \newline \ \ \ 0000001010000001}} \\
+{\ttfamily 58:\ (CALL,\ minloc,\ 3,\ \$t0)} & {\ttfamily 56:\ ADDI\ \$t2,\ \$zero,\ 1} & {{\ttfamily 56:\ 0000000000001000 \newline \ \ \ 0000001100010001}} \\
+{\ttfamily 59:\ (STORE,\ \$t0,\ k,\ -)} & {\ttfamily 57:\ SUB\ \$t3,\ \$t1,\ \$t2} & {{\ttfamily 57:\ 0000000000110000 \newline \ \ \ 1010001110001000}} \\
+{\ttfamily 60:\ (LOAD,\ k,\ -,\ \$t0)} & {\ttfamily 58:\ BGE\ \$t0,\ \$t3,\ L5} & {{\ttfamily 58:\ 0000000100000000 \newline \ \ \ 1110001000101011}} \\
+{\ttfamily 61:\ (LOAD,\ a,\ \$t0,\ \$t1)} & {\ttfamily 59:\ LOAD\ \$t0,\ high} & {{\ttfamily 59:\ 0000000110000000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 62:\ (STORE,\ \$t1,\ t,\ -)} & {\ttfamily 60:\ STORE\_STACK\ \$t0} & {{\ttfamily 60:\ 0000000000000000 \newline \ \ \ 0000001000010110}} \\
+{\ttfamily 63:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily 61:\ LOAD\ \$t0,\ i} & {{\ttfamily 61:\ 0000000110100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 64:\ (LOAD,\ a,\ \$t0,\ \$t1)} & {\ttfamily 62:\ STORE\_STACK\ \$t0} & {{\ttfamily 62:\ 0000000000000000 \newline \ \ \ 0000001000010110}} \\
+{\ttfamily 65:\ (LOAD,\ k,\ -,\ \$t0)} & {\ttfamily 63:\ LOAD\ \$t0,\ a} & {{\ttfamily 63:\ 0000000101000000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 66:\ (STORE,\ \$t1,\ a,\ \$t0)} & {\ttfamily 64:\ STORE\_STACK\ \$t0} & {{\ttfamily 64:\ 0000000000000000 \newline \ \ \ 0000001000010110}} \\
+{\ttfamily 67:\ (LOAD,\ t,\ -,\ \$t0)} & {\ttfamily 65:\ JAL\ \$ra,\ minloc} & {{\ttfamily 65:\ 1111111111110111 \newline \ \ \ 1110000010010010}} \\
+{\ttfamily 68:\ (LOAD,\ i,\ -,\ \$t1)} & {\ttfamily 66:\ LOAD\_STACK\ \$t0} & {{\ttfamily 66:\ 0000000000000000 \newline \ \ \ 0000001000011110}} \\
+{\ttfamily 69:\ (STORE,\ \$t0,\ a,\ \$t1)} & {\ttfamily 67:\ STORE\ -,\ \$t0,\ k} & {{\ttfamily 67:\ 0000000111100000 \newline \ \ \ 0000001000001001}} \\
+{\ttfamily 70:\ (LOAD,\ k,\ -,\ \$t0)} & {\ttfamily 68:\ LOAD\ \$t0,\ k} & {{\ttfamily 68:\ 0000000111100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 71:\ (LOAD,\ a,\ \$t0,\ \$t1)} & {\ttfamily 69:\ LOAD\ \$t1,\ a,\ \$t0} & {{\ttfamily 69:\ 0000000101000000 \newline \ \ \ 0000001010010001 \newline \ \ \ \ 70:\ 0000000000100000 \newline \ \ \ \ 1010001010000000 \newline \ \ \ \ 71:\ 0000000000000000 \newline \ \ \ \ 1010001010000001}} \\
+{\ttfamily 72:\ (STORE,\ \$t1,\ t,\ -)} & {\ttfamily 72:\ STORE\ -,\ \$t1,\ t} & {{\ttfamily 72:\ 0000001000000000 \newline \ \ \ 0000001010001001}} \\
+{\ttfamily 73:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily 73:\ LOAD\ \$t0,\ i} & {{\ttfamily 73:\ 0000000110100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 74:\ (LOAD,\ a,\ \$t0,\ \$t1)} & {\ttfamily 74:\ LOAD\ \$t1,\ a,\ \$t0} & {{\ttfamily 74:\ 0000000101000000 \newline \ \ \ 0000001010010001 \newline \ \ \ \ 75:\ 0000000000100000 \newline \ \ \ \ 1010001010000000 \newline \ \ \ \ 76:\ 0000000000000000 \newline \ \ \ \ 1010001010000001}} \\
+{\ttfamily 75:\ (LOAD,\ k,\ -,\ \$t0)} & {\ttfamily 77:\ LOAD\ \$t0,\ k} & {{\ttfamily 77:\ 0000000111100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 76:\ (STORE,\ \$t1,\ a,\ \$t0)} & {\ttfamily 78:\ STORE\ \$t0,\ \$t1,\ a} & {{\ttfamily 78:\ 0000000101000000 \newline \ \ \ 0000000110010001 \newline \ \ \ \ 79:\ 0000000000100000 \newline \ \ \ \ 0110000110000000 \newline \ \ \ \ 80:\ 0000000000000000 \newline \ \ \ \ 0110001010001001}} \\
+{\ttfamily 77:\ (LOAD,\ t,\ -,\ \$t0)} & {\ttfamily 81:\ LOAD\ \$t0,\ t} & {{\ttfamily 81:\ 0000001000000000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 78:\ (LOAD,\ i,\ -,\ \$t1)} & {\ttfamily 82:\ LOAD\ \$t1,\ i} & {{\ttfamily 82:\ 0000000110100000 \newline \ \ \ 0000001010000001}} \\
+{\ttfamily 79:\ (STORE,\ \$t0,\ a,\ \$t1)} & {\ttfamily 83:\ STORE\ \$t1,\ \$t0,\ a} & {{\ttfamily 83:\ 0000000101000000 \newline \ \ \ 0000000110010001 \newline \ \ \ \ 84:\ 0000000000101000 \newline \ \ \ \ 0110000110000000 \newline \ \ \ \ 85:\ 0000000000000000 \newline \ \ \ \ 0110001000001001}} \\
+{\ttfamily 80:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily 86:\ LOAD\ \$t0,\ i} & {{\ttfamily 86:\ 0000000110100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 81:\ (LOADI,\ 1,\ -,\ \$t1)} & {\ttfamily 87:\ ADDI\ \$t1,\ \$zero,\ 1} & {{\ttfamily 87:\ 0000000000001000 \newline \ \ \ 0000001010010001}} \\
+{\ttfamily 82:\ (ADD,\ \$t0,\ \$t1,\ \$t2)} & {\ttfamily 88:\ ADD\ \$t2,\ \$t0,\ \$t1} & {{\ttfamily 88:\ 0000000000101000 \newline \ \ \ 1000001100000000}} \\
+{\ttfamily 83:\ (STORE,\ \$t2,\ i,\ -)} & {\ttfamily 89:\ STORE\ -,\ \$t2,\ i} & {{\ttfamily 89:\ 0000000110100000 \newline \ \ \ 0000001100001001}} \\
+{\ttfamily 84:\ (JUMP,\ L4,\ -,\ -)} & {\ttfamily 90:\ JUMP\ L4} & {{\ttfamily 90:\ 1111111111111011 \newline \ \ \ 0110000000000010}} \\
+{\ttfamily 85:\ (LAB,\ L5,\ -,\ -)} & {\ttfamily L5:} & ~ \\
+{\ttfamily 86:\ (END,\ sort,\ -,\ -)} & {\ttfamily main:} & ~ \\
+{\ttfamily 87:\ (FUN,\ int,\ main,\ -)} & {\ttfamily 91:\ STORE\_STACK\ \$ra} & {{\ttfamily 91:\ 0000000000000000 \newline \ \ \ 0000000010010110}} \\
+{\ttfamily 88:\ (LOADI,\ 0,\ -,\ \$t0)} & {\ttfamily 92:\ ADDI\ \$t0,\ \$zero,\ 0} & {{\ttfamily 92:\ 0000000000000000 \newline \ \ \ 0000001000010001}} \\
+{\ttfamily 89:\ (STORE,\ \$t0,\ i,\ -)} & {\ttfamily 93:\ STORE\ -,\ \$t0,\ i} & {{\ttfamily 93:\ 0000000110100000 \newline \ \ \ 0000001000001001}} \\
+{\ttfamily 90:\ (LAB,\ L6,\ -,\ -)} & {\ttfamily L6:} & ~ \\
+{\ttfamily 91:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily 94:\ LOAD\ \$t0,\ i} & {{\ttfamily 94:\ 0000000110100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 92:\ (LOADI,\ 10,\ -,\ \$t1)} & {\ttfamily 95:\ ADDI\ \$t1,\ \$zero,\ 10} & {{\ttfamily 95:\ 0000000001010000 \newline \ \ \ 0000001010010001}} \\
+{\ttfamily 93:\ (BGE,\ \$t0,\ \$t1,\ L7)} & {\ttfamily 96:\ BGE\ \$t0,\ \$t1,\ L7} & {{\ttfamily 96:\ 0000000001010000 \newline \ \ \ 1010001000101011}} \\
+{\ttfamily 94:\ (IN,\ -,\ -,\ \$t0)} & {\ttfamily 97:\ IN\ \$t0} & {{\ttfamily 97:\ 0000000000000000 \newline \ \ \ 0000001000000110}} \\
+{\ttfamily 95:\ (LOAD,\ i,\ -,\ \$t1)} & {\ttfamily 98:\ LOAD\ \$t1,\ i} & {{\ttfamily 98:\ 0000000110100000 \newline \ \ \ 0000001010000001}} \\
+{\ttfamily 96:\ (STORE,\ \$t0,\ vet,\ \$t1)} & {\ttfamily 99:\ STORE\ \$t1,\ \$t0,\ vet} & {{\ttfamily 99:\ 0000000000000000 \newline \ \ \ 0000000110010001 \newline \ \ \ \ 100:\ 0000000000101000 \newline \ \ \ \ 0110000110000000 \newline \ \ \ \ 101:\ 0000000000000000 \newline \ \ \ \ 0110001000001001}} \\
+{\ttfamily 97:\ (LOAD,\ i,\ -,\ \$t0)} & {\ttfamily 102:\ LOAD\ \$t0,\ i} & {{\ttfamily 102:\ 0000000110100000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 98:\ (LOADI,\ 1,\ -,\ \$t1)} & {\ttfamily 103:\ ADDI\ \$t1,\ \$zero,\ 1} & {{\ttfamily 103:\ 0000000000001000 \newline \ \ \ 0000001010010001}} \\
+{\ttfamily 99:\ (ADD,\ \$t0,\ \$t1,\ \$t2)} & {\ttfamily 104:\ ADD\ \$t2,\ \$t0,\ \$t1} & {{\ttfamily 104:\ 0000000000101000 \newline \ \ \ 1000001100000000}} \\
+{\ttfamily 100:\ (STORE,\ \$t2,\ i,\ -)} & {\ttfamily 105:\ STORE\ -,\ \$t2,\ i} & {{\ttfamily 105:\ 0000000110100000 \newline \ \ \ 0000001100001001}} \\
+{\ttfamily 101:\ (JUMP,\ L6,\ -,\ -)} & {\ttfamily 106:\ JUMP\ L6} & {{\ttfamily 106:\ 1111111111111110 \newline \ \ \ 0110000000000010}} \\
+{\ttfamily 102:\ (LAB,\ L7,\ -,\ -)} & {\ttfamily L7:} & ~ \\
+{\ttfamily 103:\ (LOADI,\ 10,\ -,\ \$t0)} & {\ttfamily 107:\ ADDI\ \$t0,\ \$zero,\ 10} & {{\ttfamily 107:\ 0000000001010000 \newline \ \ \ 0000001000010001}} \\
+{\ttfamily 104:\ (PARAM,\ \$t0,\ -,\ -)} & {\ttfamily 108:\ STORE\_STACK\ \$t0} & {{\ttfamily 108:\ 0000000000000000 \newline \ \ \ 0000001000010110}} \\
+{\ttfamily 105:\ (LOADI,\ 0,\ -,\ \$t0)} & {\ttfamily 109:\ ADDI\ \$t0,\ \$zero,\ 0} & {{\ttfamily 109:\ 0000000000000000 \newline \ \ \ 0000001000010001}} \\
+{\ttfamily 106:\ (PARAM,\ \$t0,\ -,\ -)} & {\ttfamily 110:\ STORE\_STACK\ \$t0} & {{\ttfamily 110:\ 0000000000000000 \newline \ \ \ 0000001000010110}} \\
+{\ttfamily 107:\ (LOAD,\ vet,\ -,\ \$t0)} & {\ttfamily 111:\ LOAD\ \$t0,\ vet} & {{\ttfamily 111:\ 0000000000000000 \newline \ \ \ 0000001000000001}} \\
+{\ttfamily 108:\ (PARAM,\ \$t0,\ -,\ -)} & {\ttfamily 112:\ STORE\_STACK\ \$t0} & {{\ttfamily 112:\ 0000000000000000 \newline \ \ \ 0000001000010110}} \\
+{\ttfamily 109:\ (CALL,\ sort,\ 3,\ \$t0)} & {\ttfamily 113:\ JAL\ \$ra,\ sort} & {{\ttfamily 113:\ 1111111111110111 \newline \ \ \ 0110000010010010}} \\
+{\ttfamily 110:\ (LOADI,\ 0,\ -,\ \$t1)} & {\ttfamily 114:\ LOAD\_STACK\ \$t0} & {{\ttfamily 114:\ 0000000000000000 \newline \ \ \ 0000001000011110}} \\
+{\ttfamily 111:\ (STORE,\ \$t1,\ i,\ -)} & {\ttfamily 115:\ ADDI\ \$t1,\ \$zero,\ 0} & {{\ttfamily 115:\ 0000000000000000 \newline \ \ \ 0000001010010001}} \\
+{\ttfamily 112:\ (LAB,\ L8,\ -,\ -)} & {\ttfamily 116:\ STORE\ -,\ \$t1,\ i} & {{\ttfamily 116:\ 0000000110100000 \newline \ \ \ 0000001010001001}} \\
+{\ttfamily 113:\ (LOAD,\ i,\ -,\ \$t1)} & {\ttfamily L8:} & ~ \\
+{\ttfamily 114:\ (LOADI,\ 10,\ -,\ \$t2)} & {\ttfamily 117:\ LOAD\ \$t1,\ i} & {{\ttfamily 117:\ 0000000110100000 \newline \ \ \ 0000001010000001}} \\
+{\ttfamily 115:\ (BGE,\ \$t1,\ \$t2,\ L9)} & {\ttfamily 118:\ ADDI\ \$t2,\ \$zero,\ 10} & {{\ttfamily 118:\ 0000000001010000 \newline \ \ \ 0000001100010001}} \\
+{\ttfamily 116:\ (LOAD,\ i,\ -,\ \$t1)} & {\ttfamily 119:\ BGE\ \$t1,\ \$t2,\ L9} & {{\ttfamily 119:\ 0000000001010000 \newline \ \ \ 1100001010101011}} \\
+{\ttfamily 117:\ (LOAD,\ vet,\ \$t1,\ \$t2)} & {\ttfamily 120:\ LOAD\ \$t1,\ i} & {{\ttfamily 120:\ 0000000110100000 \newline \ \ \ 0000001010000001}} \\
+{\ttfamily 118:\ (OUT,\ \$t2,\ -,\ -)} & {\ttfamily 121:\ LOAD\ \$t2,\ vet,\ \$t1} & {{\ttfamily 121:\ 0000000000000000 \newline \ \ \ 0000001100010001 \newline \ \ \ \ 122:\ 0000000000101000 \newline \ \ \ \ 1100001100000000 \newline \ \ \ \ 123:\ 0000000000000000 \newline \ \ \ \ 1100001100000001}} \\
+{\ttfamily 119:\ (LOAD,\ i,\ -,\ \$t1)} & {\ttfamily 124:\ OUT\ \$t2} & {{\ttfamily 124:\ 0000000000000000 \newline \ \ \ 0000001100001110}} \\
+{\ttfamily 120:\ (LOADI,\ 1,\ -,\ \$t2)} & {\ttfamily 125:\ LOAD\ \$t1,\ i} & {{\ttfamily 125:\ 0000000110100000 \newline \ \ \ 0000001010000001}} \\
+{\ttfamily 121:\ (ADD,\ \$t1,\ \$t2,\ \$t3)} & {\ttfamily 126:\ ADDI\ \$t2,\ \$zero,\ 1} & {{\ttfamily 126:\ 0000000000001000 \newline \ \ \ 0000001100010001}} \\
+{\ttfamily 122:\ (STORE,\ \$t3,\ i,\ -)} & {\ttfamily 127:\ ADD\ \$t3,\ \$t1,\ \$t2} & {{\ttfamily 127:\ 0000000000110000 \newline \ \ \ 1010001110000000}} \\
+{\ttfamily 123:\ (JUMP,\ L8,\ -,\ -)} & {\ttfamily 128:\ STORE\ -,\ \$t3,\ i} & {{\ttfamily 128:\ 0000000110100000 \newline \ \ \ 0000001110001001}} \\
+{\ttfamily 124:\ (LAB,\ L9,\ -,\ -)} & {\ttfamily 129:\ JUMP\ L8} & {{\ttfamily 129:\ 1111111111111110 \newline \ \ \ 0110000000000010}} \\
+{\ttfamily 125:\ (END,\ main,\ -,\ -)} & {\ttfamily L9:} & ~ \\
+{\ttfamily 126:\ (HALT,\ -,\ -,\ -)} & {\ttfamily 130:\ HALT\ -} & {{\ttfamily 130:\ 0000000000000000 \newline \ \ \ 0000000000001100}} \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\subsection{Análise comparativa}
+
+No algoritmo de ordenação, as operações sobre vetores exigem tratamento adicional na etapa de geração de código. Quádruplas como \texttt{(LOAD, a, \$t0, \$t1)} e \texttt{(STORE, \$t1, a, \$t0)} representam acessos indexados. Na tradução para assembly, esses acessos podem ser expandidos em mais de uma instrução binária, pois o endereço efetivo precisa ser calculado a partir do endereço-base do vetor e do índice. Quando o vetor é recebido como parâmetro, o valor associado ao identificador representa o endereço-base utilizado para acessar os elementos.
+
+\section{Síntese dos Resultados}
+
+Os três testes cobrem os principais recursos implementados no compilador. O exemplo do máximo divisor comum valida chamadas recursivas com múltiplos argumentos e expressões aritméticas compostas. O exemplo do fatorial valida recursão simples, caso base e propagação do valor de retorno. O exemplo de ordenação valida laços, vetores, passagem de vetor como parâmetro e expansão de acessos indexados para instruções executáveis no processador-alvo.

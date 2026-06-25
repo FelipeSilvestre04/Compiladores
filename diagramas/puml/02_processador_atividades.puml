@@ -1,0 +1,50 @@
+@startuml
+title Diagrama de Atividades - Ciclo de Execucao do Processador
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #404040
+
+start
+:Inicializar PC, registradores\ne sinais de controle;
+
+repeat
+  :Buscar instrucao na ROM\nusando o valor atual do PC;
+  :Decodificar opcode, funct,\nregistradores e imediato;
+  :Gerar sinais de controle;
+
+  if (Instrucao HALT?) then (sim)
+    :Interromper execucao;
+  else (nao)
+    if (Tipo R?) then (sim)
+      :Ler rs1 e rs2;
+      :Executar operacao na ULA;
+      :Escrever resultado em rd;
+      :Atualizar PC para PC + 1;
+    else (nao)
+      if (Tipo I?) then (sim)
+        :Executar acesso a memoria\nou operacao com imediato;
+        :Atualizar registrador ou RAM;
+        :Atualizar PC para PC + 1;
+      else (nao)
+        if (Tipo B?) then (sim)
+          :Comparar rs1 e rs2;
+          :Atualizar PC conforme condicao;
+        else (nao)
+          if (Tipo J?) then (sim)
+            :Executar salto, retorno\nou chamada com link;
+            :Atualizar PC com destino;
+          else (IO ou NOP)
+            :Executar entrada, saida,\npilha ou nenhuma operacao;
+            :Atualizar PC para PC + 1;
+          endif
+        endif
+      endif
+    endif
+  endif
+repeat while (instrucao diferente de HALT?) is (sim)
+
+stop
+@enduml

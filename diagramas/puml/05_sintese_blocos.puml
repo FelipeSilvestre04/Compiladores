@@ -1,0 +1,41 @@
+@startuml
+title Diagrama de Blocos - Fase de Sintese do Compilador
+
+top to bottom direction
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #404040
+skinparam component {
+  BorderColor #404040
+  BackgroundColor #F7F7F7
+}
+skinparam database {
+  BorderColor #404040
+  BackgroundColor #FFFFFF
+}
+
+rectangle "AST validada" as AST
+component "Gerador de\nQuadruplas" as QUADGEN
+database "Mapa de Variaveis,\nRegistradores e Rotulos" as MAPS
+artifact "saida.quad" as QUAD
+component "Gerador de\nAssembly" as ASMGEN
+artifact "saida.asm" as ASM
+component "Gerador de\nCodigo Binario" as BINGEN
+artifact "programa.txt" as BIN
+rectangle "ROM do Processador" as ROM
+
+AST --> QUADGEN : percurso da arvore
+QUADGEN --> QUAD : codigo intermediario
+QUAD --> ASMGEN : operacoes intermediarias
+ASMGEN --> ASM : instrucoes assembly
+ASM --> BINGEN : mnemonicos e operandos
+BINGEN --> BIN : palavras de 32 bits
+BIN --> ROM : carga do programa
+
+QUADGEN <--> MAPS : temporarios,\nenderecos e labels
+ASMGEN <--> MAPS : simbolos e rotulos
+
+@enduml

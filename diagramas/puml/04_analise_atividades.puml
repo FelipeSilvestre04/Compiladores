@@ -1,0 +1,51 @@
+@startuml
+title Diagrama de Atividades - Fase de Analise do Compilador
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Arial
+skinparam ArrowColor #404040
+
+start
+:Receber arquivo-fonte em C-;
+
+repeat
+  :Ler caracteres do arquivo;
+  if (lexema reconhecido?) then (sim)
+    :Gerar token;
+  else (nao)
+    :Registrar erro lexico;
+  endif
+repeat while (fim do arquivo?) is (nao)
+
+if (existem erros lexicos?) then (sim)
+  :Interromper compilacao;
+  stop
+else (nao)
+  :Enviar tokens ao analisador sintatico;
+endif
+
+if (tokens seguem a gramatica?) then (sim)
+  :Aplicar producoes gramaticais;
+  :Construir AST;
+else (nao)
+  :Registrar erro sintatico;
+  :Interromper compilacao;
+  stop
+endif
+
+:Percorrer AST para analise semantica;
+:Registrar declaracoes na tabela de simbolos;
+:Verificar identificadores, funcoes,\nparametros, vetores, tipos e retornos;
+:Verificar existencia e assinatura da funcao main;
+
+if (existem erros semanticos?) then (sim)
+  :Emitir mensagens de erro;
+  :Interromper compilacao;
+else (nao)
+  :Liberar AST validada\npara a fase de sintese;
+endif
+
+stop
+@enduml
