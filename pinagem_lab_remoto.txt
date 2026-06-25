@@ -1,0 +1,29 @@
+# PINAGEM DO LABORATÓRIO REMOTO (FPGA DE2-115)
+
+switches | GPIO / FPGA Pin
+---------|---------
+SW0      | PIN_Y16
+SW1      | PIN_AD21
+SW2      | PIN_AE16
+SW3      | PIN_AD15
+SW4      | PIN_AE15
+SW5      | PIN_AC19
+SW6      | PIN_AF16
+SW7      | PIN_AD19
+SW8      | PIN_AF15
+SW9      | PIN_AF24
+SW10     | PIN_AE21
+SW11     | PIN_AF25
+SW12     | PIN_AC22
+SW13     | PIN_AE22
+SW14     | PIN_AF21
+SW15     | PIN_AF22
+SW16     | PIN_AD22
+SW17     | PIN_AG25
+
+botoes   | GPIO / FPGA Pin
+---------|---------
+KEY0     | PIN_AB22
+KEY1     | PIN_AC15
+KEY2     | PIN_AB21
+KEY3     | PIN_Y17

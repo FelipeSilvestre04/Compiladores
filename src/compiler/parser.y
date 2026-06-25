@@ -14,6 +14,9 @@ extern FILE *yyin;
 Node* ast_root = NULL;
 int syntax_error_count = 0;  // Contador de erros sintaticos
 
+void iniciar_compilador(Node* raiz);
+void semantic_analysis(Node* root);
+
 %}
 
 %union {

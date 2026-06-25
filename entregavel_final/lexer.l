@@ -20,7 +20,7 @@ COMENTARIO_BLOCO "/*"([^*]|\*+[^*/])*\*+"/"
     }
 }
 {NOVALINHA}        { yylineno++; }
-[ \t]+             { }
+[ \t\r]+           { }
 
 "if"     { return IF; }
 "int"    { return INT; }

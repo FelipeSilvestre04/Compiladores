@@ -72,22 +72,9 @@ set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform1.vwf
-set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform2.vwf
-set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform3.vwf
-set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS NOT_USED -section_id eda_simulation
-set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH teste_cpu -section_id eda_simulation
-set_global_assignment -name EDA_TEST_BENCH_NAME teste_cpu -section_id eda_simulation
-set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id teste_cpu
-set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME cpu -section_id teste_cpu
-set_global_assignment -name EDA_TEST_BENCH_FILE Waveform3.vwf -section_id teste_cpu
-set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform4.vwf
-set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform5.vwf
-set_global_assignment -name VECTOR_WAVEFORM_FILE Waveform6.vwf
 set_global_assignment -name VERILOG_FILE ControleSinal.v
 set_global_assignment -name VERILOG_FILE Decode7seg.v
 set_global_assignment -name VERILOG_FILE ControleSaida.v
-set_global_assignment -name VERILOG_FILE cpu_2.v
 set_global_assignment -name VERILOG_FILE DivisorFrequencia.v
 set_location_assignment PIN_H22 -to Hex0[6]
 set_location_assignment PIN_L25 -to Hex0[4]
@@ -145,29 +132,68 @@ set_location_assignment PIN_AH17 -to Hex7[3]
 set_location_assignment PIN_AG17 -to Hex7[2]
 set_location_assignment PIN_AE17 -to Hex7[1]
 set_location_assignment PIN_AD17 -to Hex7[0]
-set_location_assignment PIN_AB22 -to btn_in
-set_location_assignment PIN_Y23 -to switches[17]
-set_location_assignment PIN_Y24 -to switches[16]
-set_location_assignment PIN_AA22 -to switches[15]
-set_location_assignment PIN_AA23 -to switches[14]
-set_location_assignment PIN_AA24 -to switches[13]
-set_location_assignment PIN_AB23 -to switches[12]
-set_location_assignment PIN_AB24 -to switches[11]
-set_location_assignment PIN_AC24 -to switches[10]
-set_location_assignment PIN_AB25 -to switches[9]
-set_location_assignment PIN_AC25 -to switches[8]
-set_location_assignment PIN_AB26 -to switches[7]
-set_location_assignment PIN_AD26 -to switches[6]
-set_location_assignment PIN_AC26 -to switches[5]
-set_location_assignment PIN_AB27 -to switches[4]
-set_location_assignment PIN_AD27 -to switches[3]
-set_location_assignment PIN_AC27 -to switches[2]
-set_location_assignment PIN_AC28 -to switches[1]
-set_location_assignment PIN_AB28 -to switches[0]
-set_location_assignment PIN_AG14 -to clk_50
-set_location_assignment PIN_G19 -to led_clock
+# =================================================================
+#  SELECAO DE PINAGEM: use apenas um bloco ativo por vez
+# =================================================================
+
+# -----------------------------------------------------------------
+#  [ATIVO] OPCAO A: PLACA FISICA DE2-115
+# -----------------------------------------------------------------
+set_location_assignment PIN_M23 -to btn_in
 set_location_assignment PIN_R24 -to rst
-set_location_assignment PIN_M23 -to btn_out
+set_location_assignment PIN_F19 -to btn_out
+# btn_in = KEY0, rst = KEY3, btn_out = LEDR1
+# Pinos dos switches fisicos
+set_location_assignment PIN_AB28 -to switches[0]
+set_location_assignment PIN_AC28 -to switches[1]
+set_location_assignment PIN_AC27 -to switches[2]
+set_location_assignment PIN_AD27 -to switches[3]
+set_location_assignment PIN_AB27 -to switches[4]
+set_location_assignment PIN_AC26 -to switches[5]
+set_location_assignment PIN_AD26 -to switches[6]
+set_location_assignment PIN_AB26 -to switches[7]
+set_location_assignment PIN_AC25 -to switches[8]
+set_location_assignment PIN_AB25 -to switches[9]
+set_location_assignment PIN_AC24 -to switches[10]
+set_location_assignment PIN_AB24 -to switches[11]
+set_location_assignment PIN_AB23 -to switches[12]
+set_location_assignment PIN_AA24 -to switches[13]
+set_location_assignment PIN_AA23 -to switches[14]
+set_location_assignment PIN_AA22 -to switches[15]
+set_location_assignment PIN_Y24 -to switches[16]
+set_location_assignment PIN_Y23 -to switches[17]
+
+# -----------------------------------------------------------------
+#  [COMENTADO] OPCAO B: LABORATORIO REMOTO
+# -----------------------------------------------------------------
+# set_location_assignment PIN_AB22 -to btn_in
+# set_location_assignment PIN_Y17 -to rst
+# set_location_assignment PIN_M23 -to btn_out
+# Pinos dos switches remotos via GPIO
+# set_location_assignment PIN_Y16 -to switches[0]
+# set_location_assignment PIN_AD21 -to switches[1]
+# set_location_assignment PIN_AE16 -to switches[2]
+# set_location_assignment PIN_AD15 -to switches[3]
+# set_location_assignment PIN_AE15 -to switches[4]
+# set_location_assignment PIN_AC19 -to switches[5]
+# set_location_assignment PIN_AF16 -to switches[6]
+# set_location_assignment PIN_AD19 -to switches[7]
+# set_location_assignment PIN_AF15 -to switches[8]
+# set_location_assignment PIN_AF24 -to switches[9]
+# set_location_assignment PIN_AE21 -to switches[10]
+# set_location_assignment PIN_AF25 -to switches[11]
+# set_location_assignment PIN_AC22 -to switches[12]
+# set_location_assignment PIN_AE22 -to switches[13]
+# set_location_assignment PIN_AF21 -to switches[14]
+# set_location_assignment PIN_AF22 -to switches[15]
+# set_location_assignment PIN_AD22 -to switches[16]
+# set_location_assignment PIN_AG25 -to switches[17]
+
+# Mapeamento do clock: PIN_Y2 e o CLOCK_50 padrao da DE2-115.
+# Se o laboratorio remoto ou ambiente exigir CLOCK2_50, utilize PIN_AG14.
+set_location_assignment PIN_Y2 -to clk_50
+# set_location_assignment PIN_AG14 -to clk_50
+set_location_assignment PIN_G19 -to led_clock
 set_location_assignment PIN_H15 -to switches_leds[5]
 set_location_assignment PIN_G16 -to switches_leds[4]
 set_location_assignment PIN_G15 -to switches_leds[3]

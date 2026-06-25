@@ -1,0 +1,1 @@
+Info (10281): Verilog HDL Declaration information at cpu.v(52): object "Branch" differs only in case from object "branch" in the same scope File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_sort/cpu/cpu.v Line: 52

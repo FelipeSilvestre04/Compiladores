@@ -12,8 +12,10 @@ void liberar_reg(char* reg, int* regs_vetor);
 char* return_label(int* l);
 char* int_to_char(int val);
 void iniciar_compilador(Node* raiz);
+int check_is_static_array(char* name, char* scope);
+int check_is_array_param(char* name, char* scope);
+int get_var_addr(char* name, char* scope);
 
-// Retorna o branch INVERTIDO (pois IFF = "se falso, pula")
 char* branch_invertido(int tipo_rel) {
     switch(tipo_rel) {
         case NODE_REL_IGL:    return "BNE";
@@ -26,7 +28,6 @@ char* branch_invertido(int tipo_rel) {
     }
 }
 
-// Empilha parâmetros em ordem REVERSA (Opção A)
 void empilhar_parametros_reverso(Node* arg, int* regs_vetor, int* ptr_l, char* escopo, int* count) {
     if (arg == NULL) return;
     empilhar_parametros_reverso(arg->sibling, regs_vetor, ptr_l, escopo, count);
@@ -36,7 +37,6 @@ void empilhar_parametros_reverso(Node* arg, int* regs_vetor, int* ptr_l, char* e
     (*count)++;
 }
 
-// --- FUNÇÃO PRINCIPAL ---
 char* processa_arvore(Node* node, int* regs_vetor, int* ptr_l, char* escopo) {
     if (node == NULL) return "-";
     
@@ -54,12 +54,12 @@ char* processa_arvore(Node* node, int* regs_vetor, int* ptr_l, char* escopo) {
         }
 
         case NODE_COMPOSTO_DECL: {
-            Node* current = node->child1;
+            Node* current = node->child1; // Variaveis
             while (current != NULL) {
                 processa_arvore(current, regs_vetor, ptr_l, escopo);
                 current = current->sibling;
             }
-            current = node->child2;
+            current = node->child2; // Comandos
             while (current != NULL) {
                 processa_arvore(current, regs_vetor, ptr_l, escopo);
                 current = current->sibling;
@@ -83,8 +83,10 @@ char* processa_arvore(Node* node, int* regs_vetor, int* ptr_l, char* escopo) {
             salvar_arquivo("FUN", "int", nome, "-");
             Node* p = node->child2->child1;
             while (p != NULL) {
-                if (p->type == NODE_PARAM || p->type == NODE_PARAM_ARRAY)
-                    salvar_arquivo("ARG", p->child2->sval, "-", "-");
+                if (p->type == NODE_PARAM)
+                    salvar_arquivo("ARG", p->child2->sval, "param", "-");
+                else if (p->type == NODE_PARAM_ARRAY)
+                    salvar_arquivo("ARG", p->child2->sval, "array_param", "-");
                 p = p->sibling;
             }
             salvar_arquivo("SAVE_RA", "-", "-", "-");
@@ -117,6 +119,12 @@ char* processa_arvore(Node* node, int* regs_vetor, int* ptr_l, char* escopo) {
                 liberar_reg(arg, regs_vetor);
                 return "-";
             }
+            // Conta quantos registradores $t estao em uso (precisam ser salvos)
+            int live_count = 0;
+            for (int r = 0; r < 60; r++) {
+                if (regs_vetor[r]) live_count++;
+            }
+            salvar_arquivo("SAVE_CONTEXT", escopo, int_to_char(live_count), "-");
             int num_args = 0;
             empilhar_parametros_reverso(node->child2, regs_vetor, ptr_l, escopo, &num_args);
             char* t = alocar_reg(regs_vetor);
@@ -172,7 +180,12 @@ char* processa_arvore(Node* node, int* regs_vetor, int* ptr_l, char* escopo) {
         
         case NODE_ID: {
             char* t = alocar_reg(regs_vetor);
-            salvar_arquivo("LOAD", node->sval, "-", t); 
+            if (check_is_static_array(node->sval, escopo)) {
+                int addr = get_var_addr(node->sval, escopo);
+                salvar_arquivo("LOADI", int_to_char(addr), "-", t);
+            } else {
+                salvar_arquivo("LOAD", node->sval, "-", t);
+            }
             return t;
         }
 
@@ -190,19 +203,19 @@ char* processa_arvore(Node* node, int* regs_vetor, int* ptr_l, char* escopo) {
             return t;
         }
 
-        // Comparações agora são geradas DIRETAMENTE como branches no IF/WHILE
         case NODE_RELACIONAL: {
             char* v1 = processa_arvore(node->child1, regs_vetor, ptr_l, escopo);
             char* v2 = processa_arvore(node->child2, regs_vetor, ptr_l, escopo);
             char* t = alocar_reg(regs_vetor);
-            // Fallback: caso usado fora de IF/WHILE
+
             if (node->child3->type == NODE_REL_IGL)    salvar_arquivo("EQ", v1, v2, t);
             if (node->child3->type == NODE_REL_DIF)    salvar_arquivo("NEQ", v1, v2, t);
             if (node->child3->type == NODE_REL_MENOR)  salvar_arquivo("LT", v1, v2, t);
             if (node->child3->type == NODE_REL_LEQUAL) salvar_arquivo("LE", v1, v2, t);
             if (node->child3->type == NODE_REL_HIGHER) salvar_arquivo("GT", v1, v2, t);
             if (node->child3->type == NODE_REL_HEQUAL) salvar_arquivo("GE", v1, v2, t);
-            liberar_reg(v1, regs_vetor); liberar_reg(v2, regs_vetor);
+            liberar_reg(v1, regs_vetor); 
+            liberar_reg(v2, regs_vetor);
             return t; 
         }
 
@@ -210,13 +223,13 @@ char* processa_arvore(Node* node, int* regs_vetor, int* ptr_l, char* escopo) {
             char* lelse = return_label(ptr_l);
             char* lfim = return_label(ptr_l);
 
-            // Se o filho é uma comparação, gera branch direto!
             if (node->child1->type == NODE_RELACIONAL) {
                 char* v1 = processa_arvore(node->child1->child1, regs_vetor, ptr_l, escopo);
                 char* v2 = processa_arvore(node->child1->child2, regs_vetor, ptr_l, escopo);
                 char* br = branch_invertido(node->child1->child3->type);
                 salvar_arquivo(br, v1, v2, lelse);
-                liberar_reg(v1, regs_vetor); liberar_reg(v2, regs_vetor);
+                liberar_reg(v1, regs_vetor); 
+                liberar_reg(v2, regs_vetor);
             } else {
                 char* cond = processa_arvore(node->child1, regs_vetor, ptr_l, escopo);
                 salvar_arquivo("BEQ", cond, "$zero", lelse);
@@ -262,73 +275,525 @@ char* processa_arvore(Node* node, int* regs_vetor, int* ptr_l, char* escopo) {
     return "-";
 }
 
-// --- GATILHO ---
+#define MAX_INSTRUCTIONS 2000
+
+typedef struct {
+    char op[16];
+    char arg1[64];
+    char arg2[64];
+    char arg3[64];
+    int is_label;
+    char label_name[64];
+} AsmInstruction;
+
+typedef struct {
+    char name[64];
+    int pc;
+} LabelMap;
+
+typedef struct {
+    char name[64];
+    int addr;
+    char scope[64];
+    int is_array_param;
+    int is_array;
+} VarMap;
+
+AsmInstruction program[MAX_INSTRUCTIONS];
+int instruction_count = 0;
+
+LabelMap labels[200];
+int label_count = 0;
+
+VarMap variables[200];
+int var_count = 0;
+int next_ram_addr = 0;
+
+int live_t_stack[100];
+int live_t_stack_top = 0;
+
+int get_label_pc(char* name) {
+    for (int i = 0; i < label_count; i++) {
+        if (strcmp(labels[i].name, name) == 0) {
+            return labels[i].pc;
+        }
+    }
+    return 0;
+}
+
+char current_function_scope[64] = "global";
+
+int get_var_addr(char* name, char* scope) {
+    // 1. Busca no escopo local
+    for (int i = 0; i < var_count; i++) {
+        if (strcmp(variables[i].name, name) == 0 && strcmp(variables[i].scope, scope) == 0) {
+            return variables[i].addr;
+        }
+    }
+    // 2. Busca no escopo global
+    for (int i = 0; i < var_count; i++) {
+        if (strcmp(variables[i].name, name) == 0 && strcmp(variables[i].scope, "global") == 0) {
+            return variables[i].addr;
+        }
+    }
+    return 0;
+}
+
+int check_is_array_param(char* name, char* scope) {
+    for (int i = 0; i < var_count; i++) {
+        if (strcmp(variables[i].name, name) == 0 && strcmp(variables[i].scope, scope) == 0) {
+            return variables[i].is_array_param;
+        }
+    }
+    return 0;
+}
+
+int check_is_static_array(char* name, char* scope) {
+    for (int i = 0; i < var_count; i++) {
+        if (strcmp(variables[i].name, name) == 0) {
+            if (strcmp(variables[i].scope, scope) == 0) {
+                return (variables[i].is_array && !variables[i].is_array_param);
+            }
+        }
+    }
+    for (int i = 0; i < var_count; i++) {
+        if (strcmp(variables[i].name, name) == 0 && strcmp(variables[i].scope, "global") == 0) {
+            return (variables[i].is_array && !variables[i].is_array_param);
+        }
+    }
+    return 0;
+}
+
+int get_reg_num(char* name) {
+    if (strcmp(name, "$zero") == 0) return 0;
+    if (strcmp(name, "$ra") == 0) return 1;
+    if (strcmp(name, "$sp") == 0) return 2;
+    if (strcmp(name, "$at") == 0) return 3;
+    if (name[0] == '$' && name[1] == 't') {
+        return atoi(&name[2]) + 4; // $t0 -> 4, $t1 -> 5, etc.
+    }
+    return 0;
+}
+
+void write_binary_instruction(FILE* f, unsigned int val) {
+    for (int i = 31; i >= 0; i--) {
+        fprintf(f, "%c", (val & (1U << i)) ? '1' : '0');
+    }
+    fprintf(f, "\n");
+}
+
+void gerar_saidas_finais() {
+    FILE *f_asm = fopen("saida.asm", "w");
+    FILE *f_bin = fopen("programa.txt", "w");
+    if (!f_asm || !f_bin) {
+        printf("Erro ao criar arquivos de saida.\n");
+        return;
+    }
+
+    int current_pc = 0;
+    label_count = 0;
+    char current_scope[64] = "global";
+
+    // Pass 1: Mapear labels e calcular PC real de cada instrucao
+    for (int i = 0; i < instruction_count; i++) {
+        if (program[i].is_label) {
+            char* lbl = program[i].label_name;
+            if (lbl[0] != 'L' || (lbl[1] < '0' || lbl[1] > '9')) {
+                strcpy(current_scope, lbl);
+            }
+            if (label_count < 200) {
+                strcpy(labels[label_count].name, program[i].label_name);
+                labels[label_count].pc = current_pc;
+                label_count++;
+            }
+        } else {
+            char* op = program[i].op;
+            // LOAD/STORE com array
+            if (strcmp(op, "LOAD") == 0 && strcmp(program[i].arg3, "-") != 0 && strcmp(program[i].arg3, "0") != 0) {
+                if (check_is_array_param(program[i].arg2, current_scope)) {
+                    current_pc += 3;
+                } else {
+                    current_pc += 2;
+                }
+            } else if (strcmp(op, "STORE") == 0 && strcmp(program[i].arg1, "-") != 0 && strcmp(program[i].arg3, "0") != 0) {
+                if (check_is_array_param(program[i].arg3, current_scope)) {
+                    current_pc += 3;
+                } else {
+                    current_pc += 2;
+                }
+            } else {
+                current_pc += 1;
+            }
+        }
+    }
+
+    // Pass 2: Escrever saida.asm e programa.txt
+    current_pc = 0;
+    strcpy(current_scope, "global");
+    for (int i = 0; i < instruction_count; i++) {
+        if (program[i].is_label) {
+            fprintf(f_asm, "%s:\n", program[i].label_name);
+            char* lbl = program[i].label_name;
+            if (lbl[0] != 'L' || (lbl[1] < '0' || lbl[1] > '9')) {
+                strcpy(current_scope, lbl);
+            }
+        } else {
+            char* op = program[i].op;
+            char* arg1 = program[i].arg1;
+            char* arg2 = program[i].arg2;
+            char* arg3 = program[i].arg3;
+
+            // Escreve no saida.asm
+            if (strcmp(arg2, "-") == 0 && strcmp(arg3, "-") == 0) {
+                fprintf(f_asm, "%s %s\n", op, arg1);
+            } else if (strcmp(arg3, "-") == 0) {
+                fprintf(f_asm, "%s %s, %s\n", op, arg1, arg2);
+            } else {
+                fprintf(f_asm, "%s %s, %s, %s\n", op, arg1, arg2, arg3);
+            }
+
+            unsigned int bits = 0;
+
+            // Tradução para binário de 32 bits
+            if (strcmp(op, "JUMP") == 0) {
+                int target = get_label_pc(arg1);
+                int offset = target - current_pc - 1;
+                bits = ((offset & 0x7FFFF) << 13) | (0 << 7) | (0 << 3) | 2;
+                write_binary_instruction(f_bin, bits);
+                current_pc += 1;
+            }
+            else if (strcmp(op, "JAL") == 0) {
+                int target = get_label_pc(arg2);
+                int offset = target - current_pc - 1;
+                bits = ((offset & 0x7FFFF) << 13) | (get_reg_num(arg1) << 7) | (2 << 3) | 2;
+                write_binary_instruction(f_bin, bits);
+                current_pc += 1;
+            }
+            else if (strcmp(op, "JR") == 0) {
+                bits = (0 << 13) | (get_reg_num(arg1) << 7) | (1 << 3) | 2;
+                write_binary_instruction(f_bin, bits);
+                current_pc += 1;
+            }
+            else if (strcmp(op, "BEQ") == 0 || strcmp(op, "BNE") == 0 || strcmp(op, "BLT") == 0 ||
+                     strcmp(op, "BLE") == 0 || strcmp(op, "BGT") == 0 || strcmp(op, "BGE") == 0) {
+                int funct = 0;
+                if (strcmp(op, "BEQ") == 0) funct = 0;
+                else if (strcmp(op, "BNE") == 0) funct = 1;
+                else if (strcmp(op, "BLT") == 0) funct = 2;
+                else if (strcmp(op, "BLE") == 0) funct = 3;
+                else if (strcmp(op, "BGT") == 0) funct = 4;
+                else if (strcmp(op, "BGE") == 0) funct = 5;
+
+                int target = get_label_pc(arg3);
+                int offset = target - current_pc - 1;
+                bits = ((offset & 0x1FFF) << 19) | (get_reg_num(arg2) << 13) | (get_reg_num(arg1) << 7) | (funct << 3) | 3;
+                write_binary_instruction(f_bin, bits);
+                current_pc += 1;
+            }
+            else if (strcmp(op, "ADD") == 0 || strcmp(op, "SUB") == 0 || strcmp(op, "MULT") == 0 ||
+                     strcmp(op, "DIV") == 0 || strcmp(op, "AND") == 0 || strcmp(op, "OR") == 0 ||
+                     strcmp(op, "XOR") == 0) {
+                int funct = 0;
+                if (strcmp(op, "ADD") == 0) funct = 0;
+                else if (strcmp(op, "SUB") == 0) funct = 1;
+                else if (strcmp(op, "MULT") == 0) funct = 2;
+                else if (strcmp(op, "DIV") == 0) funct = 3;
+                else if (strcmp(op, "AND") == 0) funct = 4;
+                else if (strcmp(op, "OR") == 0) funct = 5;
+                else if (strcmp(op, "XOR") == 0) funct = 6;
+
+                bits = (0 << 25) | (get_reg_num(arg3) << 19) | (get_reg_num(arg2) << 13) | (get_reg_num(arg1) << 7) | (funct << 3) | 0;
+                write_binary_instruction(f_bin, bits);
+                current_pc += 1;
+            }
+            else if (strcmp(op, "ADDI") == 0 || strcmp(op, "SUBI") == 0 || strcmp(op, "ANDI") == 0 ||
+                     strcmp(op, "ORI") == 0 || strcmp(op, "XORI") == 0) {
+                int funct = 2;
+                if (strcmp(op, "ADDI") == 0) funct = 2;
+                else if (strcmp(op, "SUBI") == 0) funct = 3;
+                else if (strcmp(op, "ANDI") == 0) funct = 4;
+                else if (strcmp(op, "ORI") == 0) funct = 5;
+                else if (strcmp(op, "XORI") == 0) funct = 6;
+
+                int imm = atoi(arg3);
+                bits = ((imm & 0x1FFF) << 19) | (get_reg_num(arg2) << 13) | (get_reg_num(arg1) << 7) | (funct << 3) | 1;
+                write_binary_instruction(f_bin, bits);
+                current_pc += 1;
+            }
+            else if (strcmp(op, "IN") == 0) {
+                bits = (get_reg_num(arg1) << 7) | (0 << 3) | 6;
+                write_binary_instruction(f_bin, bits);
+                current_pc += 1;
+            }
+            else if (strcmp(op, "OUT") == 0) {
+                bits = (get_reg_num(arg1) << 7) | (1 << 3) | 6;
+                write_binary_instruction(f_bin, bits);
+                current_pc += 1;
+            }
+            else if (strcmp(op, "STORE_STACK") == 0) {
+                bits = (get_reg_num(arg1) << 7) | (2 << 3) | 6;
+                write_binary_instruction(f_bin, bits);
+                current_pc += 1;
+            }
+            else if (strcmp(op, "LOAD_STACK") == 0) {
+                bits = (get_reg_num(arg1) << 7) | (3 << 3) | 6;
+                write_binary_instruction(f_bin, bits);
+                current_pc += 1;
+            }
+            else if (strcmp(op, "HALT") == 0) {
+                bits = (1 << 3) | 4;
+                write_binary_instruction(f_bin, bits);
+                current_pc += 1;
+            }
+            else if (strcmp(op, "LOAD") == 0) {
+                // LOAD rd, var, idx
+                if (strcmp(arg3, "-") != 0 && strcmp(arg3, "0") != 0) {
+                    int addr = get_var_addr(arg2, current_scope);
+                    if (check_is_array_param(arg2, current_scope)) {
+                        // Acesso a Array Parametro (Ponteiro)
+                        // 1. LOAD rd, addr($zero) (carrega base_addr de 'a')
+                        bits = ((addr & 0x1FFF) << 19) | (0 << 13) | (get_reg_num(arg1) << 7) | (0 << 3) | 1;
+                        write_binary_instruction(f_bin, bits);
+                        // 2. ADD rd, rd, idx (rd = base_addr + idx)
+                        bits = (0 << 25) | (get_reg_num(arg3) << 19) | (get_reg_num(arg1) << 13) | (get_reg_num(arg1) << 7) | (0 << 3) | 0;
+                        write_binary_instruction(f_bin, bits);
+                        // 3. LOAD rd, 0(rd) (carrega o elemento real)
+                        bits = (0 << 19) | (get_reg_num(arg1) << 13) | (get_reg_num(arg1) << 7) | (0 << 3) | 1;
+                        write_binary_instruction(f_bin, bits);
+                        current_pc += 3;
+                    } else {
+                        // Acesso a Array Local/Global Estatico
+                        // 1. ADDI rd, idx, addr (rd = idx + base_addr)
+                        bits = ((addr & 0x1FFF) << 19) | (get_reg_num(arg3) << 13) | (get_reg_num(arg1) << 7) | (2 << 3) | 1;
+                        write_binary_instruction(f_bin, bits);
+                        // 2. LOAD rd, 0(rd)
+                        bits = (0 << 19) | (get_reg_num(arg1) << 13) | (get_reg_num(arg1) << 7) | (0 << 3) | 1;
+                        write_binary_instruction(f_bin, bits);
+                        current_pc += 2;
+                    }
+                } else {
+                    // Acesso a variavel simples: LOAD rd, var
+                    int addr = get_var_addr(arg2, current_scope);
+                    bits = ((addr & 0x1FFF) << 19) | (0 << 13) | (get_reg_num(arg1) << 7) | (0 << 3) | 1;
+                    write_binary_instruction(f_bin, bits);
+                    current_pc += 1;
+                }
+            }
+            else if (strcmp(op, "STORE") == 0) {
+                if (strcmp(arg3, "0") == 0) {
+                    // Simple store do ARG: STORE value_reg, var_name, 0
+                    int addr = get_var_addr(arg2, current_scope);
+                    bits = ((addr & 0x1FFF) << 19) | (0 << 13) | (get_reg_num(arg1) << 7) | (1 << 3) | 1;
+                    write_binary_instruction(f_bin, bits);
+                    current_pc += 1;
+                } else if (strcmp(arg1, "-") == 0) {
+                    // Simple store da atribuicao: STORE -, value_reg, var_name
+                    int addr = get_var_addr(arg3, current_scope);
+                    bits = ((addr & 0x1FFF) << 19) | (0 << 13) | (get_reg_num(arg2) << 7) | (1 << 3) | 1;
+                    write_binary_instruction(f_bin, bits);
+                    current_pc += 1;
+                } else {
+                    // Acesso a Array: STORE idx_reg, value_reg, array_name
+                    int addr = get_var_addr(arg3, current_scope);
+                    if (check_is_array_param(arg3, current_scope)) {
+                        // STORE em Array Parametro (Ponteiro)
+                        // 1. LOAD $at, addr($zero) (carrega base_addr de 'a')
+                        bits = ((addr & 0x1FFF) << 19) | (0 << 13) | (3 << 7) | (0 << 3) | 1;
+                        write_binary_instruction(f_bin, bits);
+                        // 2. ADD $at, $at, idx ($at = base_addr + idx)
+                        bits = (0 << 25) | (get_reg_num(arg1) << 19) | (3 << 13) | (3 << 7) | (0 << 3) | 0;
+                        write_binary_instruction(f_bin, bits);
+                        // 3. STORE value_reg, 0($at)
+                        bits = (0 << 19) | (3 << 13) | (get_reg_num(arg2) << 7) | (1 << 3) | 1;
+                        write_binary_instruction(f_bin, bits);
+                        current_pc += 3;
+                    } else {
+                        // Acesso a Array Local/Global Estatico
+                        // 1. ADDI $at, idx_reg, addr ($at = idx + base_addr)
+                        bits = ((addr & 0x1FFF) << 19) | (get_reg_num(arg1) << 13) | (3 << 7) | (2 << 3) | 1;
+                        write_binary_instruction(f_bin, bits);
+                        // 2. STORE value_reg, 0, $at
+                        bits = (0 << 19) | (3 << 13) | (get_reg_num(arg2) << 7) | (1 << 3) | 1;
+                        write_binary_instruction(f_bin, bits);
+                        current_pc += 2;
+                    }
+                }
+            }
+        }
+    }
+
+    fclose(f_asm);
+    fclose(f_bin);
+}
+
 void iniciar_compilador(Node* raiz) {
     FILE *f1 = fopen("saida.quad", "w"); if (f1) fclose(f1);
-    FILE *f2 = fopen("saida.asm", "w");  if (f2) fclose(f2);
+    instruction_count = 0;
+    var_count = 0;
+    next_ram_addr = 0;
+    live_t_stack_top = 0;
     int regs_vetor[64];
     int i;
     for(i = 0; i < 64; i++) regs_vetor[i] = 0;
     int l = 0; 
     processa_arvore(raiz, regs_vetor, &l, "global"); 
+    
+    // Gera os arquivos saida.asm e programa.txt
+    gerar_saidas_finais();
 }
-
-// --- ESCRITA ---
 
 void salvar_quad(char* OP, char* A1, char* A2, char* RES) {
     FILE *f = fopen("saida.quad", "a"); 
     if (f) { fprintf(f, "(%s, %s, %s, %s)\n", OP, A1, A2, RES); fclose(f); }
 }
 
-// Escreve uma linha de assembly REAL (não quádrupla)
 void salvar_asm_line(char* OP, char* A1, char* A2, char* A3) {
-    FILE *f = fopen("saida.asm", "a"); 
-    if (f) {
-        if (strcmp(A2, "-") == 0 && strcmp(A3, "-") == 0)
-            fprintf(f, "%s %s\n", OP, A1);
-        else if (strcmp(A3, "-") == 0)
-            fprintf(f, "%s %s, %s\n", OP, A1, A2);
-        else
-            fprintf(f, "%s %s, %s, %s\n", OP, A1, A2, A3);
-        fclose(f);
-    }
+    if (instruction_count >= MAX_INSTRUCTIONS) return;
+    AsmInstruction* inst = &program[instruction_count++];
+    strncpy(inst->op, OP, 15); inst->op[15] = '\0';
+    strncpy(inst->arg1, A1, 63); inst->arg1[63] = '\0';
+    strncpy(inst->arg2, A2, 63); inst->arg2[63] = '\0';
+    strncpy(inst->arg3, A3, 63); inst->arg3[63] = '\0';
+    inst->is_label = 0;
 }
 
 void salvar_asm_label(char* nome) {
-    FILE *f = fopen("saida.asm", "a"); 
-    if (f) { fprintf(f, "%s:\n", nome); fclose(f); }
+    if (instruction_count >= MAX_INSTRUCTIONS) return;
+    AsmInstruction* inst = &program[instruction_count++];
+    inst->is_label = 1;
+    strncpy(inst->label_name, nome, 63); inst->label_name[63] = '\0';
 }
 
 void salvar_asm_raw(char* texto) {
-    FILE *f = fopen("saida.asm", "a"); 
-    if (f) { fprintf(f, "%s\n", texto); fclose(f); }
+    if (instruction_count >= MAX_INSTRUCTIONS) return;
+    AsmInstruction* inst = &program[instruction_count++];
+    strncpy(inst->op, texto, 15); inst->op[15] = '\0';
+    strcpy(inst->arg1, "-");
+    strcpy(inst->arg2, "-");
+    strcpy(inst->arg3, "-");
+    inst->is_label = 0;
 }
 
-// --- DISPATCHER ---
 void salvar_arquivo(char* OP, char* A1, char* A2, char* RES) {
-    // Fase 1: Quádrupla (exceto instruções internas)
+    if (strcmp(OP, "FUN") == 0) {
+        strcpy(current_function_scope, A2);
+    }
+
+    // Registra variáveis alocadas estaticamente
+    if (strcmp(OP, "ALLOC") == 0) {
+        char scope[64];
+        int size = 1;
+        int is_arr = 0;
+        if (strcmp(RES, "-") != 0) {
+            strcpy(scope, RES);
+            size = atoi(A2);
+            is_arr = 1;
+        } else {
+            strcpy(scope, A2);
+            size = 1;
+            is_arr = 0;
+        }
+        int found = 0;
+        for (int i = 0; i < var_count; i++) {
+            if (strcmp(variables[i].name, A1) == 0 && strcmp(variables[i].scope, scope) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found && var_count < 200) {
+            strcpy(variables[var_count].name, A1);
+            strcpy(variables[var_count].scope, scope);
+            variables[var_count].addr = next_ram_addr;
+            variables[var_count].is_array_param = 0;
+            variables[var_count].is_array = is_arr;
+            next_ram_addr += size;
+            var_count++;
+        }
+        // ALLOC não gera quádrupla nem assembly
+        return;
+    }
+
+    // Registra parâmetros de funções como variáveis
+    if (strcmp(OP, "ARG") == 0) {
+        int found = 0;
+        for (int i = 0; i < var_count; i++) {
+            if (strcmp(variables[i].name, A1) == 0 && strcmp(variables[i].scope, current_function_scope) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found && var_count < 200) {
+            strcpy(variables[var_count].name, A1);
+            strcpy(variables[var_count].scope, current_function_scope);
+            variables[var_count].addr = next_ram_addr;
+            int is_arr_p = (strcmp(A2, "array_param") == 0) ? 1 : 0;
+            variables[var_count].is_array_param = is_arr_p;
+            variables[var_count].is_array = is_arr_p;
+            next_ram_addr += 1;
+            var_count++;
+        }
+    }
+
     if (strcmp(OP, "SAVE_RA") != 0)
         salvar_quad(OP, A1, A2, RES);
     
-    // Fase 2: Assembly real do processador
-    
-    // --- Branch direto (BEQ, BNE, BLT, BLE, BGT, BGE) ---
     if (strcmp(OP,"BEQ")==0 || strcmp(OP,"BNE")==0 || strcmp(OP,"BLT")==0 ||
         strcmp(OP,"BLE")==0 || strcmp(OP,"BGT")==0 || strcmp(OP,"BGE")==0) {
         salvar_asm_line(OP, A1, A2, RES); // RES = label
     }
-    // --- PARAM → Push na pilha ---
     else if (strcmp(OP, "PARAM") == 0) {
         salvar_asm_line("STORE_STACK", A1, "-", "-");
     }
-    // --- CALL → JAL + Pop retorno ---
+    else if (strcmp(OP, "SAVE_CONTEXT") == 0) {
+        // A2 contem o numero de registradores $t em uso (live_count)
+        int live_t_count = atoi(A2);
+        if (live_t_stack_top < 100) {
+            live_t_stack[live_t_stack_top++] = live_t_count;
+        }
+        
+        // 1. Salva todas as variáveis locais da função chamadora atual na pilha
+        for (int v = 0; v < var_count; v++) {
+            if (strcmp(variables[v].scope, current_function_scope) == 0) {
+                salvar_asm_line("LOAD", "$at", variables[v].name, "0");
+                salvar_asm_line("STORE_STACK", "$at", "-", "-");
+            }
+        }
+        // 2. Salva registradores temporarios $t em uso
+        for (int r = 0; r < live_t_count; r++) {
+            char reg_name[16];
+            sprintf(reg_name, "$t%d", r);
+            salvar_asm_line("STORE_STACK", reg_name, "-", "-");
+        }
+    }
     else if (strcmp(OP, "CALL") == 0) {
+        // B. Emite chamada JAL real
         salvar_asm_line("JAL", "$ra", A1, "-");
+
+        // C. Se retornar valor, o retorno está no topo da pilha. Extrair antes de restaurar.
         if (strcmp(RES, "-") != 0) {
             salvar_asm_line("LOAD_STACK", RES, "-", "-");
         }
+
+        // D. Restaura registradores temporarios $t na ordem reversa
+        int live_t_count = 0;
+        if (live_t_stack_top > 0) {
+            live_t_count = live_t_stack[--live_t_stack_top];
+        }
+        // Restaurar $t regs na ordem reversa (ultimo salvo = primeiro restaurado)
+        for (int r = live_t_count - 1; r >= 0; r--) {
+            char reg_name[16];
+            sprintf(reg_name, "$t%d", r);
+            salvar_asm_line("LOAD_STACK", reg_name, "-", "-");
+        }
+
+        // E. Restaura as variáveis locais na ordem REVERSA
+        for (int v = var_count - 1; v >= 0; v--) {
+            if (strcmp(variables[v].scope, current_function_scope) == 0) {
+                salvar_asm_line("LOAD_STACK", "$at", "-", "-");
+                salvar_asm_line("STORE", "$at", variables[v].name, "0");
+            }
+        }
     }
-    // --- RET → Restaura $ra, empilha resultado, JR ---
     else if (strcmp(OP, "RET") == 0) {
         salvar_asm_line("LOAD_STACK", "$ra", "-", "-");
         if (strcmp(A1, "-") != 0) {
@@ -336,58 +801,48 @@ void salvar_arquivo(char* OP, char* A1, char* A2, char* RES) {
         }
         salvar_asm_line("JR", "$ra", "-", "-");
     }
-    // --- ARG → Pop param da pilha ---
     else if (strcmp(OP, "ARG") == 0) {
         salvar_asm_line("LOAD_STACK", "$at", "-", "-");
         salvar_asm_line("STORE", "$at", A1, "0");
     }
-    // --- SAVE_RA → Push $ra ---
     else if (strcmp(OP, "SAVE_RA") == 0) {
         salvar_asm_line("STORE_STACK", "$ra", "-", "-");
     }
-    // --- LOADI → ADDI rd, $zero, imm ---
     else if (strcmp(OP, "LOADI") == 0) {
         salvar_asm_line("ADDI", RES, "$zero", A1);
     }
-    // --- LAB → Label no assembly ---
     else if (strcmp(OP, "LAB") == 0) {
         salvar_asm_label(A1);
     }
-    // --- FUN → Label da função ---
     else if (strcmp(OP, "FUN") == 0) {
-        salvar_asm_label(A2); // A2 = nome da função
+        salvar_asm_label(A2); 
     }
-    // --- JUMP ---
     else if (strcmp(OP, "JUMP") == 0) {
         salvar_asm_line("JUMP", A1, "-", "-");
     }
-    // --- IN/OUT (pseudo-instruções de I/O) ---
     else if (strcmp(OP, "IN") == 0) {
         salvar_asm_line("IN", RES, "-", "-");
     }
     else if (strcmp(OP, "OUT") == 0) {
         salvar_asm_line("OUT", A1, "-", "-");
     }
-    // --- END, HALT, ALLOC ---
     else if (strcmp(OP, "END") == 0) {
-        // Nada no assembly (é só marcação)
+        if (strcmp(A1, "main") != 0) {
+            salvar_asm_line("LOAD_STACK", "$ra", "-", "-");
+            salvar_asm_line("JR", "$ra", "-", "-");
+        }
     }
     else if (strcmp(OP, "HALT") == 0) {
         salvar_asm_raw("HALT");
     }
-    else if (strcmp(OP, "ALLOC") == 0) {
-        // Alocação será resolvida pelo linker/loader
-    }
-    // --- 1:1: ADD, SUB, MULT, DIV, LOAD, STORE ---
     else {
-        salvar_asm_line(OP, RES, A1, A2); // Formato: OP rd, rs1, rs2
+        salvar_asm_line(OP, RES, A1, A2); 
     }
 }
 
-// --- AUXILIARES ---
 char* alocar_reg(int* regs_vetor) {
     int i;
-    for(i = 0; i < 64; i++) {
+    for(i = 0; i < 60; i++) {
         if (regs_vetor[i] == 0) {
             regs_vetor[i] = 1;
             char* t = (char*) malloc(16);

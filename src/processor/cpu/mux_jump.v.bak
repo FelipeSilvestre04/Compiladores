@@ -1,9 +1,0 @@
-module mux_jump(
-    input  logic       sign,     // Sinal Jump
-    input  [31:0]    im1,      // imediato_J_ex
-    input  [31:0]    im2,      // imediato_I_ex
-    output [31:0]    im
-);
-    // Se sign=1 (Jump), seleciona o imediato do Tipo J. Senão, o do Tipo I/B.
-    assign im = (sign == 1'b1) ? im1 : im2;
-endmodule

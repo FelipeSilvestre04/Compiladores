@@ -1,0 +1,37 @@
+# Build logs
+*.log
+build.err
+
+# Flex/Bison generated files
+src/compiler/lex.yy.c
+src/compiler/parser.tab.c
+src/compiler/parser.tab.h
+
+# Compiler generated outputs
+src/compiler/saida.asm
+src/compiler/saida.quad
+src/compiler/programa.txt
+src/compiler/ofc.quad
+
+# Stale/local binaries
+src/compiler/compilador.exe
+entregavel_final/compilador.exe
+
+# Quartus generated directories
+work/
+src/processor/cpu/db/
+src/processor/cpu/incremental_db/
+src/processor/cpu/output_files/
+src/processor/cpu/simulation/
+src/processor/cpu/work/
+
+# Quartus temporary and waveform files
+*.bak
+*.old
+*.vwf
+
+# Runtime traces
+src/processor/cpu/trace.txt
+
+# Local lock files
+*.flock

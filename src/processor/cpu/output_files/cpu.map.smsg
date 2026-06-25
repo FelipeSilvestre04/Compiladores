@@ -1,2 +1,0 @@
-Info (10281): Verilog HDL Declaration information at cpu.v(52): object "Branch" differs only in case from object "branch" in the same scope File: C:/Users/felip/Downloads/cpu_felipe_PC4/cpu.v Line: 52
-Info (10281): Verilog HDL Declaration information at cpu_2.v(63): object "Branch" differs only in case from object "branch" in the same scope File: C:/Users/felip/Downloads/cpu_felipe_PC4/cpu_2.v Line: 63
