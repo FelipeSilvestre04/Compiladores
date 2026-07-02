@@ -361,12 +361,16 @@ def run_simulation(
     trace=False,
     trace_limit=200,
     input_latency=0,
+    output_latency=0,
 ):
     instructions = read_program(programa_path)
     input_values = list(input_values or [])
     input_index = 0
     pending_input = None
     pending_wait = 0
+    pending_output_active = False
+    pending_output_wait = 0
+    output_emitted = False
 
     if not quiet:
         print("=" * 60)
@@ -420,10 +424,21 @@ def run_simulation(
                         print("Por favor, digite um valor inteiro valido.")
                 pending_wait = 0
 
+        if control.WriteToIO and not pending_output_active:
+            pending_output_active = True
+            pending_output_wait = max(0, output_latency)
+            output_emitted = False
+        elif not control.WriteToIO:
+            pending_output_active = False
+            pending_output_wait = 0
+            output_emitted = False
+
         io_read_strobe = int((not control.IN_signal) or pending_wait == 0)
+        io_output_strobe = int((not control.WriteToIO) or pending_output_wait == 0)
         switch_data_extended = u32((pending_input or 0) & 0x3FFFF) if control.IN_signal else 0
         stall_for_input = int(control.IN_signal and not io_read_strobe)
-        effective_halt = int(control.Halt or stall_for_input)
+        stall_for_output = int(control.WriteToIO and not io_output_strobe)
+        effective_halt = int(control.Halt or stall_for_input or stall_for_output)
 
         rs1_real = decoded.rw if control.JR else decoded.rs1
         rs1_data = 0 if rs1_real == 0 else regs[rs1_real]
@@ -488,9 +503,10 @@ def run_simulation(
         if final_display_enable:
             display_value = to_signed_32(display_data_muxed)
 
-        if control.WriteToIO:
+        if control.WriteToIO and not output_emitted:
             out_val = to_signed_32(rs1_data)
             outputs.append(out_val)
+            output_emitted = True
             if quiet:
                 print(f"OUT {out_val}")
             else:
@@ -507,6 +523,12 @@ def run_simulation(
             else:
                 pending_input = None
 
+        if control.WriteToIO:
+            if stall_for_output:
+                pending_output_wait -= 1
+                if not quiet:
+                    print("[OUT] aguardando botao para avancar")
+
         steps += 1
 
         if control.Halt:
@@ -518,6 +540,10 @@ def run_simulation(
         # Negedge: PC atualiza se effective_halt estiver inativo.
         if not effective_halt:
             pc = u32(endereco_alvo_salto)
+            if control.WriteToIO:
+                pending_output_active = False
+                pending_output_wait = 0
+                output_emitted = False
 
     timed_out = steps >= max_steps and not halted
 
@@ -568,6 +594,7 @@ def main():
     parser.add_argument("--max-steps", type=int, default=100000, help="Limite de ciclos simulados.")
     parser.add_argument("--rom-bits", type=int, default=8, help="Bits de endereco da ROM simulada. Use 8 para a ROM atual.")
     parser.add_argument("--input-latency", type=int, default=0, help="Ciclos segurando PC em IN antes do botao/strobe.")
+    parser.add_argument("--output-latency", type=int, default=0, help="Ciclos segurando PC em OUT antes do botao/strobe.")
     args = parser.parse_args()
 
     result = run_simulation(
@@ -580,6 +607,7 @@ def main():
         trace=args.trace,
         trace_limit=args.trace_limit,
         input_latency=args.input_latency,
+        output_latency=args.output_latency,
     )
 
     if args.quiet:

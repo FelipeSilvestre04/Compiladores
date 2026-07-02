@@ -1,0 +1,53 @@
+JUMP main
+soma:
+LOAD_STACK $at
+STORE $at, v, 0
+LOAD_STACK $at
+STORE $at, i, 0
+STORE_STACK $ra
+LOAD $t0, i
+LOAD $t1, v, $t0
+ADDI $t0, $zero, 1
+ADD $t2, $t1, $t0
+STORE -, $t2, r
+LOAD $t0, r
+LOAD_STACK $ra
+STORE_STACK $t0
+JR $ra
+LOAD_STACK $ra
+JR $ra
+main:
+STORE_STACK $ra
+ADDI $t0, $zero, 4
+ADDI $t1, $zero, 0
+STORE $t1, $t0, a
+ADDI $t0, $zero, 5
+ADDI $t1, $zero, 1
+STORE $t1, $t0, a
+LOAD $at, a, 0
+STORE_STACK $at
+LOAD $at, x, 0
+STORE_STACK $at
+ADDI $t0, $zero, 1
+STORE_STACK $t0
+ADDI $t0, $zero, 3
+STORE_STACK $t0
+JAL $ra, soma
+LOAD_STACK $t0
+LOAD_STACK $at
+STORE $at, x, 0
+LOAD_STACK $at
+STORE $at, a, 0
+STORE -, $t0, x
+LOAD $t0, x
+ADDI $t1, $zero, 5
+BLE $t0, $t1, L0
+LOAD $t0, x
+OUT $t0
+JUMP L1
+L0:
+ADDI $t0, $zero, 0
+LOAD $t1, a, $t0
+OUT $t1
+L1:
+HALT -

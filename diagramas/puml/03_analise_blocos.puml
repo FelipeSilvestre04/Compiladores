@@ -21,11 +21,11 @@ artifact "Codigo-fonte C-" as SRC
 component "Analisador Lexico\nlexer.l" as LEX
 queue "Tokens" as TOK
 component "Analisador Sintatico\nparser.y" as PARSER
-component "Construcao da AST" as ASTGEN
-rectangle "Arvore Sintatica\nAbstrata (AST)" as AST
-component "Analisador Semantico" as SEM
-database "Tabela de Simbolos" as SYMTAB
-rectangle "AST validada" as VALID
+component "Construcao da AST\nparser.y + ast.h" as ASTGEN
+rectangle "Arvore Sintatica\nAbstrata\nast.h" as AST
+component "Analisador Semantico\nsemantic_analysis()\nparser.y" as SEM
+database "Tabela de Simbolos\nstruct Symbol\nparser.y" as SYMTAB
+rectangle "AST validada\npara sintese" as VALID
 rectangle "Mensagens de Erro" as ERR
 
 SRC --> LEX : caracteres
@@ -36,7 +36,7 @@ ASTGEN --> AST : nos da arvore
 AST --> SEM : percurso semantico
 SEM --> VALID : programa aceito
 
-SEM <--> SYMTAB : declaracoes,\nfuncoes e tipos
+SEM <--> SYMTAB : declaracoes,\nfuncoes, escopos e tipos
 LEX --> ERR : erros lexicos
 PARSER --> ERR : erros sintaticos
 SEM --> ERR : erros semanticos

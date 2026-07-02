@@ -1,0 +1,334 @@
+Mapeamento de quadruplas para assembly
+======================================
+
+Fonte principal: src/compiler/gerador_quaduplas.c
+
+Este documento descreve o que cada quadrupla gera na etapa de assembly.
+Algumas quadruplas geram uma unica instrucao. Outras sao diretivas que nao
+aparecem no assembly ou expandem para varias instrucoes.
+
+
+1. Diretivas sem instrucao direta
+---------------------------------
+
+(ALLOC, nome, escopo, -)
+(ALLOC, nome, tamanho, escopo)
+    Assembly:
+        nenhum
+
+    Efeito:
+        Registra variavel ou vetor em variables[] e reserva endereco na RAM.
+
+
+(SAVE_RA, -, -, -)
+    Assembly:
+        STORE_STACK $ra
+
+    Observacao:
+        Nao aparece em saida.quad, mas e usado internamente no inicio de funcao.
+
+
+2. Funcoes e labels
+-------------------
+
+(FUN, tipo, nome_funcao, -)
+    Assembly:
+        nome_funcao:
+
+    Efeito:
+        Cria label de entrada da funcao.
+
+
+(END, main, -, -)
+    Assembly:
+        nenhum
+
+
+(END, nome_funcao, -, -) quando nome_funcao != main
+    Assembly:
+        LOAD_STACK $ra
+        JR $ra
+
+    Observacao:
+        Gera retorno implicito no fim de funcoes diferentes de main.
+
+
+(LAB, nome_label, -, -)
+    Assembly:
+        nome_label:
+
+    Observacao:
+        Label nao e instrucao; apenas marca o PC da proxima instrucao real.
+
+
+3. Saltos e desvios
+-------------------
+
+(JUMP, label, -, -)
+    Assembly:
+        JUMP label
+
+
+(BEQ, r1, r2, label)
+    Assembly:
+        BEQ r1, r2, label
+
+
+(BNE, r1, r2, label)
+    Assembly:
+        BNE r1, r2, label
+
+
+(BLT, r1, r2, label)
+    Assembly:
+        BLT r1, r2, label
+
+
+(BLE, r1, r2, label)
+    Assembly:
+        BLE r1, r2, label
+
+
+(BGT, r1, r2, label)
+    Assembly:
+        BGT r1, r2, label
+
+
+(BGE, r1, r2, label)
+    Assembly:
+        BGE r1, r2, label
+
+
+4. Carga e armazenamento
+------------------------
+
+(LOADI, constante, -, destino)
+    Assembly:
+        ADDI destino, $zero, constante
+
+    Exemplo:
+        (LOADI, 5, -, $t0)
+        ADDI $t0, $zero, 5
+
+
+(LOAD, nome_variavel, -, destino)
+    Assembly:
+        LOAD destino, nome_variavel
+
+    Exemplo:
+        (LOAD, x, -, $t0)
+        LOAD $t0, x
+
+    Observacao:
+        Na geracao binaria, nome_variavel e substituido pelo endereco de RAM.
+
+
+(LOAD, nome_vetor, registrador_indice, destino)
+    Assembly:
+        LOAD destino, nome_vetor, registrador_indice
+
+    Exemplo:
+        (LOAD, a, $t0, $t1)
+        LOAD $t1, a, $t0
+
+    Observacao:
+        No binario, pode expandir.
+
+        Vetor local/global:
+            ADDI destino, registrador_indice, endereco_base
+            LOAD destino, 0(destino)
+
+        Vetor parametro:
+            LOAD destino, endereco_do_parametro($zero)
+            ADD destino, destino, registrador_indice
+            LOAD destino, 0(destino)
+
+
+(STORE, valor, nome_variavel, -)
+    Assembly simbolico gerado:
+        STORE -, valor, nome_variavel
+
+    Exemplo:
+        (STORE, $t0, x, -)
+        STORE -, $t0, x
+
+    Observacao:
+        O primeiro campo "-" e usado pelo backend para identificar store simples
+        de atribuicao. No binario, nome_variavel e resolvido para endereco de RAM.
+
+
+(STORE, valor, nome_vetor, registrador_indice)
+    Assembly:
+        STORE registrador_indice, valor, nome_vetor
+
+    Exemplo:
+        (STORE, $t0, a, $t1)
+        STORE $t1, $t0, a
+
+    Observacao:
+        No binario, pode expandir.
+
+        Vetor local/global:
+            ADDI $at, registrador_indice, endereco_base
+            STORE valor, 0($at)
+
+        Vetor parametro:
+            LOAD $at, endereco_do_parametro($zero)
+            ADD $at, $at, registrador_indice
+            STORE valor, 0($at)
+
+
+5. Operacoes aritmeticas
+------------------------
+
+(ADD, r1, r2, destino)
+    Assembly:
+        ADD destino, r1, r2
+
+
+(SUB, r1, r2, destino)
+    Assembly:
+        SUB destino, r1, r2
+
+
+(MULT, r1, r2, destino)
+    Assembly:
+        MULT destino, r1, r2
+
+
+(DIV, r1, r2, destino)
+    Assembly:
+        DIV destino, r1, r2
+
+
+6. Relacionais como valor
+-------------------------
+
+(EQ, r1, r2, destino)
+    Assembly simbolico:
+        EQ destino, r1, r2
+
+
+(NEQ, r1, r2, destino)
+    Assembly simbolico:
+        NEQ destino, r1, r2
+
+
+(LT, r1, r2, destino)
+    Assembly simbolico:
+        LT destino, r1, r2
+
+
+(LE, r1, r2, destino)
+    Assembly simbolico:
+        LE destino, r1, r2
+
+
+(GT, r1, r2, destino)
+    Assembly simbolico:
+        GT destino, r1, r2
+
+
+(GE, r1, r2, destino)
+    Assembly simbolico:
+        GE destino, r1, r2
+
+    Observacao:
+        O backend binario atual nao possui caso de codificacao para EQ, NEQ,
+        LT, LE, GT e GE como instrucoes finais. Em if/while, o compilador evita
+        essa forma e gera diretamente BEQ, BNE, BLT, BLE, BGT ou BGE.
+
+
+7. Parametros, chamada, contexto e retorno
+------------------------------------------
+
+(ARG, nome_parametro, param, -)
+(ARG, nome_parametro, array_param, -)
+    Assembly:
+        LOAD_STACK $at
+        STORE $at, nome_parametro, 0
+
+    Efeito:
+        No inicio da funcao chamada, retira argumento da pilha e salva na RAM
+        associada ao parametro.
+
+
+(PARAM, registrador_valor, -, -)
+    Assembly:
+        STORE_STACK registrador_valor
+
+    Efeito:
+        Empilha argumento antes da chamada.
+
+
+(SAVE_CONTEXT, escopo, qtd_temporarios, -)
+    Assembly:
+        Para cada variavel local do escopo atual:
+            LOAD $at, nome_variavel, 0
+            STORE_STACK $at
+
+        Para cada registrador temporario vivo $t0 ... $tN:
+            STORE_STACK $tN
+
+    Efeito:
+        Preserva variaveis locais e temporarios antes de CALL.
+
+
+(CALL, nome_funcao, numero_argumentos, destino)
+    Assembly:
+        JAL $ra, nome_funcao
+
+        Se destino != "-":
+            LOAD_STACK destino
+
+        Depois, restaura temporarios vivos em ordem reversa:
+            LOAD_STACK $tN
+            ...
+            LOAD_STACK $t0
+
+        Depois, restaura variaveis locais em ordem reversa:
+            LOAD_STACK $at
+            STORE $at, nome_variavel, 0
+
+    Efeito:
+        Chama a funcao, recupera retorno se existir e restaura o contexto.
+
+
+(RET, -, -, -)
+    Assembly:
+        LOAD_STACK $ra
+        JR $ra
+
+
+(RET, registrador_valor, -, -)
+    Assembly:
+        LOAD_STACK $ra
+        STORE_STACK registrador_valor
+        JR $ra
+
+    Efeito:
+        Recupera endereco de retorno, empilha valor retornado se houver e volta
+        com JR $ra.
+
+
+8. Entrada, saida e parada
+--------------------------
+
+(IN, -, -, destino)
+    Assembly:
+        IN destino
+
+
+(OUT, registrador_valor, -, -)
+    Assembly:
+        OUT registrador_valor
+
+
+(HALT, -, -, -)
+    Assembly:
+        HALT
+
+    Observacao:
+        No arquivo saida.asm pode aparecer como "HALT -" por causa da forma
+        como a linha bruta e armazenada internamente.
+

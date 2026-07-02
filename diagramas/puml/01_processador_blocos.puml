@@ -18,37 +18,46 @@ skinparam rectangle {
 }
 
 rectangle "Busca e Decodificacao" {
-  rectangle "PC\nContador de Programa" as PC
-  rectangle "ROM de Instrucoes\nprograma.txt" as ROM
-  rectangle "Decodificador\nde Instrucao" as DEC
+  rectangle "PC\nPC.v" as PC
+  rectangle "ROM de Instrucoes\nrom.v / programa.txt" as ROM
+  rectangle "Decodificador\ndecoder_instrucao.v" as DEC
 }
 
 rectangle "Controle" {
-  rectangle "Unidade de\nControle" as UC
-  rectangle "Controle de Desvio\nbranch / jump / jal / jr" as CTRLPC
+  rectangle "Unidade de Controle\nUnidade_Controle.v" as UC
+  rectangle "Controle de PC\nbranch / jump / jr / jal" as CTRLPC
 }
 
 rectangle "Caminho de Dados" {
-  rectangle "Banco de\nRegistradores" as REG
-  rectangle "ULA" as ULA
-  rectangle "Memoria de Dados\nRAM" as RAM
-  rectangle "Unidade de Pilha\nSP interno" as STACK
-  rectangle "Entrada e Saida\nIN / OUT" as IO
+  rectangle "Banco de Registradores\nbanco.v" as REG
+  rectangle "MUX da ULA\nmux_ula.v" as MUXULA
+  rectangle "ULA\nula.v" as ULA
+  rectangle "Memoria de Dados\nram.v" as RAM
+  rectangle "MUX de Escrita\nmux_memoria.v" as MUXMEM
+  rectangle "Pilha / SP\ncpu.v + ram.v" as STACK
+  rectangle "Entrada e Saida\nControleSinal.v / ControleSaida.v" as IO
 }
 
 PC -down-> ROM : endereco
 ROM -down-> DEC : instrucao
-DEC -down-> UC : campos decodificados
+DEC -right-> UC : opcode e funct
+DEC -down-> REG : rs1, rs2 e rd
 
-UC -down-> REG : controle
-UC -right-> CTRLPC : fluxo
+UC -down-> REG : RegWrite
+UC -down-> MUXULA : ALUSrc / ALUop
+UC -right-> CTRLPC : Jump / Branch / Halt
 CTRLPC -up-> PC : proximo PC
 
-REG -left-> ULA : operandos
-ULA -right-> REG : resultado
+REG -down-> MUXULA : rs2
+MUXULA -right-> ULA : operando
+REG -right-> ULA : rs1
+ULA -right-> MUXMEM : resultado
+MUXMEM -up-> REG : dado escrito
 
-REG -down-> RAM : load/store
-REG -down-> STACK : pilha
-REG -down-> IO : entrada/saida
+ULA -down-> RAM : endereco
+RAM -up-> MUXMEM : dado lido
+REG -down-> RAM : dado de STORE
+RAM -down-> STACK : push / pop
+REG -down-> IO : IN / OUT
 
 @enduml

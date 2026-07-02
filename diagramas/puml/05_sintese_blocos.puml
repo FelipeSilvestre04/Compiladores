@@ -17,15 +17,15 @@ skinparam database {
   BackgroundColor #FFFFFF
 }
 
-rectangle "AST validada" as AST
-component "Gerador de\nQuadruplas" as QUADGEN
-database "Mapa de Variaveis,\nRegistradores e Rotulos" as MAPS
+rectangle "AST validada\nast.h" as AST
+component "Geracao de Quadruplas\nprocessa_arvore()\ngerador_quaduplas.c" as QUADGEN
+database "Estruturas Internas\nprogram[], labels[], variables[]\ngerador_quaduplas.c" as MAPS
 artifact "saida.quad" as QUAD
-component "Gerador de\nAssembly" as ASMGEN
+component "Traducao para Assembly\nsalvar_asm_line()\ngerador_quaduplas.c" as ASMGEN
 artifact "saida.asm" as ASM
-component "Gerador de\nCodigo Binario" as BINGEN
+component "Codificacao Binaria\nwrite_binary_instruction()\ngerador_quaduplas.c" as BINGEN
 artifact "programa.txt" as BIN
-rectangle "ROM do Processador" as ROM
+rectangle "ROM do Processador\nrom.v" as ROM
 
 AST --> QUADGEN : percurso da arvore
 QUADGEN --> QUAD : codigo intermediario
@@ -35,7 +35,8 @@ ASM --> BINGEN : mnemonicos e operandos
 BINGEN --> BIN : palavras de 32 bits
 BIN --> ROM : carga do programa
 
-QUADGEN <--> MAPS : temporarios,\nenderecos e labels
-ASMGEN <--> MAPS : simbolos e rotulos
+QUADGEN <--> MAPS : temporarios,\nenderecos e escopos
+ASMGEN <--> MAPS : rotulos e instrucoes
+BINGEN <--> MAPS : labels e PCs
 
 @enduml

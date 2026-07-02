@@ -9,17 +9,17 @@ skinparam ArrowColor #404040
 
 start
 :Receber AST validada;
-:Inicializar tabelas de variaveis,\nregistradores temporarios e rotulos;
+:Inicializar program[], labels[], variables[],\nregistradores temporarios e rotulos;
 
-:Percorrer nos da AST;
-:Classificar cada no visitado\ncomo expressao, comando, funcao,\nchamada ou acesso a vetor;
+:Percorrer nos da AST em processa_arvore();
+:Classificar cada no pelo switch de NodeType\ncomo declaracao, expressao, comando,\nfuncao, chamada ou vetor;
 :Gerar quadruplas correspondentes\nADD, LOAD, STORE, JUMP, LAB,\nFUN, ARG, PARAM, CALL, RET e END;
 
 :Salvar codigo intermediario\nem saida.quad;
 :Ler quadruplas geradas;
 
 repeat
-  :Selecionar regra de traducao\nda quadrupla atual;
+  :Selecionar regra de traducao\npela operacao da quadrupla;
   if (quadrupla tem mapeamento direto?) then (sim)
     :Emitir uma instrucao assembly;
   else (nao)

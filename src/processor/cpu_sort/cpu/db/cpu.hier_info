@@ -25,7 +25,7 @@ switches[14] => switch_data.DATAB
 switches[15] => switch_data.DATAB
 switches[16] => switch_data.DATAB
 switches[17] => switch_data.DATAB
-btn_in => btn_in.IN1
+btn_in => btn_in.IN2
 led_clock <= clk.DB_MAX_OUTPUT_PORT_TYPE
 Hex0[0] <= ControleSaida:display_controller.Hex0
 Hex0[1] <= ControleSaida:display_controller.Hex0
@@ -90,7 +90,7 @@ switches_leds[3] <= switches[3].DB_MAX_OUTPUT_PORT_TYPE
 switches_leds[4] <= switches[4].DB_MAX_OUTPUT_PORT_TYPE
 switches_leds[5] <= switches[5].DB_MAX_OUTPUT_PORT_TYPE
 btn_out <= btn_in.DB_MAX_OUTPUT_PORT_TYPE
-in_sign_out <= IN_signal.DB_MAX_OUTPUT_PORT_TYPE
+in_sign_out <= in_sign_out.DB_MAX_OUTPUT_PORT_TYPE
 
 
 |cpu|DivisorFrequencia:Divisor_inst
@@ -619,6 +619,12 @@ LOAD_STACK_en <= LOAD_STACK_en.DB_MAX_OUTPUT_PORT_TYPE
 
 
 |cpu|ControleSinal:io_signal_control
+in => saida~reg0.ACLR
+btn => saida~reg0.CLK
+saida <= saida~reg0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|cpu|ControleSinal:out_signal_control
 in => saida~reg0.ACLR
 btn => saida~reg0.CLK
 saida <= saida~reg0.DB_MAX_OUTPUT_PORT_TYPE

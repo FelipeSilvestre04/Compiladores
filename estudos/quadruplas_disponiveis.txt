@@ -1,0 +1,350 @@
+Quadruplas disponiveis na fase de sintese
+==========================================
+
+Fonte principal: src/compiler/gerador_quaduplas.c
+
+Formato geral:
+
+    (OP, ARG1, ARG2, RES)
+
+Nem toda operacao abaixo aparece necessariamente em saida.quad. Algumas sao
+diretivas internas usadas pelo gerador para registrar variaveis, salvar retorno
+ou montar o assembly.
+
+
+1. Diretivas de programa, funcao e memoria
+------------------------------------------
+
+ALLOC
+    Forma para variavel simples:
+        (ALLOC, nome, escopo, -)
+
+    Forma para vetor:
+        (ALLOC, nome, tamanho, escopo)
+
+    Funcao:
+        Registra variaveis e vetores na tabela interna variables[].
+        Define endereco fixo na RAM usando next_ram_addr.
+
+    Observacao:
+        Nao e gravada em saida.quad e nao gera assembly diretamente.
+
+
+FUN
+    Forma:
+        (FUN, tipo, nome_funcao, -)
+
+    Funcao:
+        Marca o inicio de uma funcao e atualiza o escopo corrente.
+
+
+ARG
+    Forma para parametro simples:
+        (ARG, nome_parametro, param, -)
+
+    Forma para parametro vetor:
+        (ARG, nome_parametro, array_param, -)
+
+    Funcao:
+        Registra parametro da funcao e gera codigo para receber o argumento da pilha.
+
+
+SAVE_RA
+    Forma:
+        (SAVE_RA, -, -, -)
+
+    Funcao:
+        Diretiva interna para salvar o registrador de retorno $ra no inicio da funcao.
+
+    Observacao:
+        Nao e gravada em saida.quad, mas gera assembly.
+
+
+END
+    Forma:
+        (END, nome_funcao, -, -)
+
+    Funcao:
+        Marca o fim de uma funcao.
+
+
+HALT
+    Forma:
+        (HALT, -, -, -)
+
+    Funcao:
+        Finaliza o programa.
+
+
+2. Carga, armazenamento e constantes
+------------------------------------
+
+LOADI
+    Forma:
+        (LOADI, constante, -, destino)
+
+    Funcao:
+        Carrega uma constante imediata ou endereco conhecido em um registrador.
+
+
+LOAD
+    Forma para variavel simples:
+        (LOAD, nome_variavel, -, destino)
+
+    Forma para vetor:
+        (LOAD, nome_vetor, registrador_indice, destino)
+
+    Funcao:
+        Carrega da memoria para um registrador.
+
+    Observacao:
+        Para vetor local/global, o endereco real e base + indice.
+        Para vetor parametro, o parametro guarda a base do vetor; por isso existe
+        uma indirecao adicional.
+
+
+STORE
+    Forma para variavel simples:
+        (STORE, valor, nome_variavel, -)
+
+    Forma para vetor:
+        (STORE, valor, nome_vetor, registrador_indice)
+
+    Funcao:
+        Armazena um valor na memoria.
+
+    Observacao:
+        Em vetor local/global, o destino e base + indice.
+        Em vetor parametro, primeiro o compilador carrega a base armazenada no
+        parametro e depois soma o indice.
+
+
+3. Operacoes aritmeticas
+------------------------
+
+ADD
+    Forma:
+        (ADD, operando1, operando2, destino)
+
+    Funcao:
+        Soma dois registradores.
+
+
+SUB
+    Forma:
+        (SUB, operando1, operando2, destino)
+
+    Funcao:
+        Subtrai dois registradores.
+
+
+MULT
+    Forma:
+        (MULT, operando1, operando2, destino)
+
+    Funcao:
+        Multiplica dois registradores.
+
+
+DIV
+    Forma:
+        (DIV, operando1, operando2, destino)
+
+    Funcao:
+        Divide dois registradores.
+
+
+4. Relacionais como valor intermediario
+---------------------------------------
+
+EQ
+    Forma:
+        (EQ, operando1, operando2, destino)
+
+    Funcao:
+        Representa comparacao de igualdade.
+
+
+NEQ
+    Forma:
+        (NEQ, operando1, operando2, destino)
+
+    Funcao:
+        Representa comparacao de diferenca.
+
+
+LT
+    Forma:
+        (LT, operando1, operando2, destino)
+
+    Funcao:
+        Representa comparacao menor que.
+
+
+LE
+    Forma:
+        (LE, operando1, operando2, destino)
+
+    Funcao:
+        Representa comparacao menor ou igual.
+
+
+GT
+    Forma:
+        (GT, operando1, operando2, destino)
+
+    Funcao:
+        Representa comparacao maior que.
+
+
+GE
+    Forma:
+        (GE, operando1, operando2, destino)
+
+    Funcao:
+        Representa comparacao maior ou igual.
+
+    Observacao sobre EQ, NEQ, LT, LE, GT e GE:
+        O gerador pode emitir essas quadruplas quando uma expressao relacional
+        e avaliada como expressao. No fluxo normal de if/while, o compilador
+        nao usa essas quadruplas; ele gera diretamente um branch invertido.
+        O backend binario atual nao possui codificacao especifica para essas
+        operacoes como resultado booleano.
+
+
+5. Desvios condicionais
+-----------------------
+
+BEQ
+    Forma:
+        (BEQ, operando1, operando2, label)
+
+    Funcao:
+        Desvia se operando1 == operando2.
+
+
+BNE
+    Forma:
+        (BNE, operando1, operando2, label)
+
+    Funcao:
+        Desvia se operando1 != operando2.
+
+
+BLT
+    Forma:
+        (BLT, operando1, operando2, label)
+
+    Funcao:
+        Desvia se operando1 < operando2.
+
+
+BLE
+    Forma:
+        (BLE, operando1, operando2, label)
+
+    Funcao:
+        Desvia se operando1 <= operando2.
+
+
+BGT
+    Forma:
+        (BGT, operando1, operando2, label)
+
+    Funcao:
+        Desvia se operando1 > operando2.
+
+
+BGE
+    Forma:
+        (BGE, operando1, operando2, label)
+
+    Funcao:
+        Desvia se operando1 >= operando2.
+
+    Observacao:
+        Em if/while com expressao relacional, o compilador gera o branch
+        invertido. Exemplo: x > 5 vira BLE x, 5, label_falso.
+
+
+6. Labels e saltos
+------------------
+
+LAB
+    Forma:
+        (LAB, nome_label, -, -)
+
+    Funcao:
+        Marca uma posicao no codigo intermediario.
+
+    Observacao:
+        Label nao e instrucao. Ele recebe o PC da proxima instrucao real.
+
+
+JUMP
+    Forma:
+        (JUMP, label_ou_funcao, -, -)
+
+    Funcao:
+        Desvio incondicional.
+
+
+7. Chamadas de funcao, parametros e retorno
+-------------------------------------------
+
+SAVE_CONTEXT
+    Forma:
+        (SAVE_CONTEXT, escopo_chamador, qtd_temporarios_vivos, -)
+
+    Funcao:
+        Salva contexto antes de uma chamada de funcao.
+
+    Observacao:
+        Salva variaveis locais do escopo atual e registradores temporarios vivos.
+
+
+PARAM
+    Forma:
+        (PARAM, registrador_valor, -, -)
+
+    Funcao:
+        Empilha argumento antes de uma chamada.
+
+
+CALL
+    Forma:
+        (CALL, nome_funcao, numero_argumentos, destino)
+
+    Funcao:
+        Chama uma funcao e, se houver retorno, coloca o valor em destino.
+
+
+RET
+    Forma sem valor:
+        (RET, -, -, -)
+
+    Forma com valor:
+        (RET, registrador_valor, -, -)
+
+    Funcao:
+        Retorna da funcao atual.
+
+
+8. Entrada e saida
+------------------
+
+IN
+    Forma:
+        (IN, -, -, destino)
+
+    Funcao:
+        Le valor de entrada para um registrador.
+
+
+OUT
+    Forma:
+        (OUT, registrador_valor, -, -)
+
+    Funcao:
+        Escreve valor na saida.
+

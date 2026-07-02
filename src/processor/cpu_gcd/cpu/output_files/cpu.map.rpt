@@ -1,5 +1,5 @@
 Analysis & Synthesis report for cpu
-Thu Jun 25 12:56:15 2026
+Wed Jul  1 18:37:55 2026
 Quartus Prime Version 21.1.0 Build 842 10/21/2021 SJ Lite Edition
 
 
@@ -71,15 +71,15 @@ https://fpgasoftware.intel.com/eula.
 +----------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                     ;
 +------------------------------------+---------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Thu Jun 25 12:56:14 2026       ;
+; Analysis & Synthesis Status        ; Successful - Wed Jul  1 18:37:55 2026       ;
 ; Quartus Prime Version              ; 21.1.0 Build 842 10/21/2021 SJ Lite Edition ;
 ; Revision Name                      ; cpu                                         ;
 ; Top-level Entity Name              ; cpu                                         ;
 ; Family                             ; Cyclone IV E                                ;
 ; Total logic elements               ; 12,504                                      ;
-;     Total combinational functions  ; 10,295                                      ;
-;     Dedicated logic registers      ; 2,369                                       ;
-; Total registers                    ; 2369                                        ;
+;     Total combinational functions  ; 10,294                                      ;
+;     Dedicated logic registers      ; 2,370                                       ;
+; Total registers                    ; 2370                                        ;
 ; Total pins                         ; 86                                          ;
 ; Total virtual pins                 ; 0                                           ;
 ; Total memory bits                  ; 0                                           ;
@@ -193,7 +193,7 @@ https://fpgasoftware.intel.com/eula.
 ;     Processor 5            ;   0.1%      ;
 ;     Processor 6            ;   0.1%      ;
 ;     Processor 7            ;   0.1%      ;
-;     Processor 8            ;   0.1%      ;
+;     Processor 8            ;   0.0%      ;
 +----------------------------+-------------+
 
 
@@ -267,18 +267,18 @@ https://fpgasoftware.intel.com/eula.
 +---------------------------------------------+-----------------------------------------+
 ; Estimated Total logic elements              ; 12,504                                  ;
 ;                                             ;                                         ;
-; Total combinational functions               ; 10295                                   ;
+; Total combinational functions               ; 10294                                   ;
 ; Logic element usage by number of LUT inputs ;                                         ;
-;     -- 4 input functions                    ; 4249                                    ;
-;     -- 3 input functions                    ; 2589                                    ;
-;     -- <=2 input functions                  ; 3457                                    ;
+;     -- 4 input functions                    ; 4251                                    ;
+;     -- 3 input functions                    ; 2588                                    ;
+;     -- <=2 input functions                  ; 3455                                    ;
 ;                                             ;                                         ;
 ; Logic elements by mode                      ;                                         ;
-;     -- normal mode                          ; 7699                                    ;
+;     -- normal mode                          ; 7698                                    ;
 ;     -- arithmetic mode                      ; 2596                                    ;
 ;                                             ;                                         ;
-; Total registers                             ; 2369                                    ;
-;     -- Dedicated logic registers            ; 2369                                    ;
+; Total registers                             ; 2370                                    ;
+;     -- Dedicated logic registers            ; 2370                                    ;
 ;     -- I/O registers                        ; 0                                       ;
 ;                                             ;                                         ;
 ; I/O pins                                    ; 86                                      ;
@@ -287,7 +287,7 @@ https://fpgasoftware.intel.com/eula.
 ;                                             ;                                         ;
 ; Maximum fan-out node                        ; DivisorFrequencia:Divisor_inst|clkSaida ;
 ; Maximum fan-out                             ; 2344                                    ;
-; Total fan-out                               ; 38303                                   ;
+; Total fan-out                               ; 38306                                   ;
 ; Average fan-out                             ; 2.98                                    ;
 +---------------------------------------------+-----------------------------------------+
 
@@ -297,7 +297,7 @@ https://fpgasoftware.intel.com/eula.
 +-------------------------------------------+---------------------+---------------------------+-------------+--------------+---------+-----------+------+--------------+---------------------------------------------------------------------------------------------------------------------------------------+---------------------+--------------+
 ; Compilation Hierarchy Node                ; Combinational ALUTs ; Dedicated Logic Registers ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; Pins ; Virtual Pins ; Full Hierarchy Name                                                                                                                   ; Entity Name         ; Library Name ;
 +-------------------------------------------+---------------------+---------------------------+-------------+--------------+---------+-----------+------+--------------+---------------------------------------------------------------------------------------------------------------------------------------+---------------------+--------------+
-; |cpu                                      ; 10295 (258)         ; 2369 (6)                  ; 0           ; 6            ; 0       ; 3         ; 86   ; 0            ; |cpu                                                                                                                                  ; cpu                 ; work         ;
+; |cpu                                      ; 10294 (259)         ; 2370 (6)                  ; 0           ; 6            ; 0       ; 3         ; 86   ; 0            ; |cpu                                                                                                                                  ; cpu                 ; work         ;
 ;    |ControleSaida:display_controller|     ; 6451 (83)           ; 32 (32)                   ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ControleSaida:display_controller                                                                                                 ; ControleSaida       ; work         ;
 ;       |Decode7seg:D0|                     ; 7 (7)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ControleSaida:display_controller|Decode7seg:D0                                                                                   ; Decode7seg          ; work         ;
 ;       |Decode7seg:D1|                     ; 7 (7)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ControleSaida:display_controller|Decode7seg:D1                                                                                   ; Decode7seg          ; work         ;
@@ -368,9 +368,10 @@ https://fpgasoftware.intel.com/eula.
 ;             |sign_div_unsign_olh:divider| ; 80 (0)              ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ControleSaida:display_controller|lpm_divide:Mod7|lpm_divide_3bm:auto_generated|sign_div_unsign_olh:divider                       ; sign_div_unsign_olh ; work         ;
 ;                |alt_u_div_47f:divider|    ; 80 (80)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ControleSaida:display_controller|lpm_divide:Mod7|lpm_divide_3bm:auto_generated|sign_div_unsign_olh:divider|alt_u_div_47f:divider ; alt_u_div_47f       ; work         ;
 ;    |ControleSinal:io_signal_control|      ; 0 (0)               ; 1 (1)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ControleSinal:io_signal_control                                                                                                  ; ControleSinal       ; work         ;
+;    |ControleSinal:out_signal_control|     ; 0 (0)               ; 1 (1)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ControleSinal:out_signal_control                                                                                                 ; ControleSinal       ; work         ;
 ;    |DivisorFrequencia:Divisor_inst|       ; 38 (38)             ; 26 (26)                   ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|DivisorFrequencia:Divisor_inst                                                                                                   ; DivisorFrequencia   ; work         ;
 ;    |PC:PC_inst|                           ; 3 (3)               ; 32 (32)                   ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|PC:PC_inst                                                                                                                       ; PC                  ; work         ;
-;    |Unidade_Controle:UC|                  ; 26 (26)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|Unidade_Controle:UC                                                                                                              ; Unidade_Controle    ; work         ;
+;    |Unidade_Controle:UC|                  ; 24 (24)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|Unidade_Controle:UC                                                                                                              ; Unidade_Controle    ; work         ;
 ;    |banco:banco_inst|                     ; 360 (360)           ; 224 (224)                 ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|banco:banco_inst                                                                                                                 ; banco               ; work         ;
 ;    |decoder_instrucao:decoder|            ; 34 (34)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|decoder_instrucao:decoder                                                                                                        ; decoder_instrucao   ; work         ;
 ;    |mux_jump:mux_jump_inst|               ; 18 (18)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|mux_jump:mux_jump_inst                                                                                                           ; mux_jump            ; work         ;
@@ -378,14 +379,14 @@ https://fpgasoftware.intel.com/eula.
 ;    |mux_ula:mux_ula_inst|                 ; 35 (35)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|mux_ula:mux_ula_inst                                                                                                             ; mux_ula             ; work         ;
 ;    |ram:ram_inst|                         ; 1429 (1429)         ; 2048 (2048)               ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ram:ram_inst                                                                                                                     ; ram                 ; work         ;
 ;    |rom:ROM|                              ; 81 (81)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|rom:ROM                                                                                                                          ; rom                 ; work         ;
-;    |ula:ula_inst|                         ; 1446 (165)          ; 0 (0)                     ; 0           ; 6            ; 0       ; 3         ; 0    ; 0            ; |cpu|ula:ula_inst                                                                                                                     ; ula                 ; work         ;
-;       |lpm_divide:Div0|                   ; 1253 (0)            ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0                                                                                                     ; lpm_divide          ; work         ;
-;          |lpm_divide_92p:auto_generated|  ; 1253 (0)            ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0|lpm_divide_92p:auto_generated                                                                       ; lpm_divide_92p      ; work         ;
-;             |abs_divider_4dg:divider|     ; 1253 (54)           ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0|lpm_divide_92p:auto_generated|abs_divider_4dg:divider                                               ; abs_divider_4dg     ; work         ;
-;                |alt_u_div_7af:divider|    ; 1086 (1083)         ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0|lpm_divide_92p:auto_generated|abs_divider_4dg:divider|alt_u_div_7af:divider                         ; alt_u_div_7af       ; work         ;
+;    |ula:ula_inst|                         ; 1446 (166)          ; 0 (0)                     ; 0           ; 6            ; 0       ; 3         ; 0    ; 0            ; |cpu|ula:ula_inst                                                                                                                     ; ula                 ; work         ;
+;       |lpm_divide:Div0|                   ; 1252 (0)            ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0                                                                                                     ; lpm_divide          ; work         ;
+;          |lpm_divide_92p:auto_generated|  ; 1252 (0)            ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0|lpm_divide_92p:auto_generated                                                                       ; lpm_divide_92p      ; work         ;
+;             |abs_divider_4dg:divider|     ; 1252 (53)           ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0|lpm_divide_92p:auto_generated|abs_divider_4dg:divider                                               ; abs_divider_4dg     ; work         ;
+;                |alt_u_div_7af:divider|    ; 1087 (1084)         ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0|lpm_divide_92p:auto_generated|abs_divider_4dg:divider|alt_u_div_7af:divider                         ; alt_u_div_7af       ; work         ;
 ;                   |add_sub_7pc:add_sub_0| ; 1 (1)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0|lpm_divide_92p:auto_generated|abs_divider_4dg:divider|alt_u_div_7af:divider|add_sub_7pc:add_sub_0   ; add_sub_7pc         ; work         ;
 ;                   |add_sub_8pc:add_sub_1| ; 2 (2)               ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0|lpm_divide_92p:auto_generated|abs_divider_4dg:divider|alt_u_div_7af:divider|add_sub_8pc:add_sub_1   ; add_sub_8pc         ; work         ;
-;                |lpm_abs_i0a:my_abs_den|   ; 68 (68)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0|lpm_divide_92p:auto_generated|abs_divider_4dg:divider|lpm_abs_i0a:my_abs_den                        ; lpm_abs_i0a         ; work         ;
+;                |lpm_abs_i0a:my_abs_den|   ; 67 (67)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0|lpm_divide_92p:auto_generated|abs_divider_4dg:divider|lpm_abs_i0a:my_abs_den                        ; lpm_abs_i0a         ; work         ;
 ;                |lpm_abs_i0a:my_abs_num|   ; 45 (45)             ; 0 (0)                     ; 0           ; 0            ; 0       ; 0         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_divide:Div0|lpm_divide_92p:auto_generated|abs_divider_4dg:divider|lpm_abs_i0a:my_abs_num                        ; lpm_abs_i0a         ; work         ;
 ;       |lpm_mult:Mult0|                    ; 28 (0)              ; 0 (0)                     ; 0           ; 6            ; 0       ; 3         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_mult:Mult0                                                                                                      ; lpm_mult            ; work         ;
 ;          |mult_46t:auto_generated|        ; 28 (28)             ; 0 (0)                     ; 0           ; 6            ; 0       ; 3         ; 0    ; 0            ; |cpu|ula:ula_inst|lpm_mult:Mult0|mult_46t:auto_generated                                                                              ; mult_46t            ; work         ;
@@ -2957,10 +2958,10 @@ Note: number of Embedded Multiplier Blocks used is only available after a succes
 +----------------------------------------------+-------+
 ; Statistic                                    ; Value ;
 +----------------------------------------------+-------+
-; Total registers                              ; 2369  ;
+; Total registers                              ; 2370  ;
 ; Number of registers using Synchronous Clear  ; 0     ;
 ; Number of registers using Synchronous Load   ; 0     ;
-; Number of registers using Asynchronous Clear ; 33    ;
+; Number of registers using Asynchronous Clear ; 34    ;
 ; Number of registers using Asynchronous Load  ; 0     ;
 ; Number of registers using Clock Enable       ; 2342  ;
 ; Number of registers using Preset             ; 0     ;
@@ -3479,22 +3480,22 @@ Note: In order to hide this table in the UI and the text report file, please set
 ; Type                  ; Count                       ;
 +-----------------------+-----------------------------+
 ; boundary_port         ; 86                          ;
-; cycloneiii_ff         ; 2369                        ;
-;     CLR               ; 1                           ;
+; cycloneiii_ff         ; 2370                        ;
+;     CLR               ; 2                           ;
 ;     ENA               ; 2310                        ;
 ;     ENA CLR           ; 32                          ;
 ;     plain             ; 26                          ;
-; cycloneiii_lcell_comb ; 10298                       ;
+; cycloneiii_lcell_comb ; 10296                       ;
 ;     arith             ; 2596                        ;
 ;         1 data inputs ; 7                           ;
 ;         2 data inputs ; 154                         ;
 ;         3 data inputs ; 2435                        ;
-;     normal            ; 7702                        ;
+;     normal            ; 7700                        ;
 ;         0 data inputs ; 308                         ;
-;         1 data inputs ; 120                         ;
-;         2 data inputs ; 2871                        ;
-;         3 data inputs ; 154                         ;
-;         4 data inputs ; 4249                        ;
+;         1 data inputs ; 119                         ;
+;         2 data inputs ; 2869                        ;
+;         3 data inputs ; 153                         ;
+;         4 data inputs ; 4251                        ;
 ; cycloneiii_mac_mult   ; 3                           ;
 ; cycloneiii_mac_out    ; 3                           ;
 ;                       ;                             ;
@@ -3508,7 +3509,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 +----------------+--------------+
 ; Partition Name ; Elapsed Time ;
 +----------------+--------------+
-; Top            ; 00:00:20     ;
+; Top            ; 00:00:23     ;
 +----------------+--------------+
 
 
@@ -3518,7 +3519,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 Info: *******************************************************************
 Info: Running Quartus Prime Analysis & Synthesis
     Info: Version 21.1.0 Build 842 10/21/2021 SJ Lite Edition
-    Info: Processing started: Thu Jun 25 12:55:46 2026
+    Info: Processing started: Wed Jul  1 18:37:11 2026
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off cpu -c cpu
 Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
 Info (20030): Parallel compilation is enabled and will use 8 of the 8 processors detected
@@ -3555,32 +3556,32 @@ Info (12021): Found 1 design units, including 1 entities, in source file control
 Info (12021): Found 1 design units, including 1 entities, in source file divisorfrequencia.v
     Info (12023): Found entity 1: DivisorFrequencia File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/DivisorFrequencia.v Line: 2
 Info (12127): Elaborating entity "cpu" for the top level hierarchy
-Info (12128): Elaborating entity "DivisorFrequencia" for hierarchy "DivisorFrequencia:Divisor_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 80
+Info (12128): Elaborating entity "DivisorFrequencia" for hierarchy "DivisorFrequencia:Divisor_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 82
 Warning (10230): Verilog HDL assignment warning at DivisorFrequencia.v(14): truncated value with size 32 to match size of target (25) File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/DivisorFrequencia.v Line: 14
-Info (12128): Elaborating entity "PC" for hierarchy "PC:PC_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 92
-Info (12128): Elaborating entity "rom" for hierarchy "rom:ROM" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 98
+Info (12128): Elaborating entity "PC" for hierarchy "PC:PC_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 94
+Info (12128): Elaborating entity "rom" for hierarchy "rom:ROM" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 100
 Warning (10850): Verilog HDL warning at rom.v(14): number of words (60) in memory file does not match the number of elements in the address range [0:255] File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/rom.v Line: 14
 Warning (10030): Net "rom.data_a" at rom.v(9) has no driver or initial value, using a default initial value '0' File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/rom.v Line: 9
 Warning (10030): Net "rom.waddr_a" at rom.v(9) has no driver or initial value, using a default initial value '0' File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/rom.v Line: 9
 Warning (10030): Net "rom.we_a" at rom.v(9) has no driver or initial value, using a default initial value '0' File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/rom.v Line: 9
-Info (12128): Elaborating entity "decoder_instrucao" for hierarchy "decoder_instrucao:decoder" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 105
+Info (12128): Elaborating entity "decoder_instrucao" for hierarchy "decoder_instrucao:decoder" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 107
 Warning (10270): Verilog HDL Case Statement warning at decoder_instrucao.v(59): incomplete case statement has no default case item File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/decoder_instrucao.v Line: 59
 Warning (10270): Verilog HDL Case Statement warning at decoder_instrucao.v(24): incomplete case statement has no default case item File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/decoder_instrucao.v Line: 24
-Info (12128): Elaborating entity "Unidade_Controle" for hierarchy "Unidade_Controle:UC" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 119
+Info (12128): Elaborating entity "Unidade_Controle" for hierarchy "Unidade_Controle:UC" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 121
 Warning (10270): Verilog HDL Case Statement warning at Unidade_Controle.v(63): incomplete case statement has no default case item File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/Unidade_Controle.v Line: 63
 Warning (10270): Verilog HDL Case Statement warning at Unidade_Controle.v(104): incomplete case statement has no default case item File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/Unidade_Controle.v Line: 104
 Warning (10270): Verilog HDL Case Statement warning at Unidade_Controle.v(144): incomplete case statement has no default case item File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/Unidade_Controle.v Line: 144
 Warning (10270): Verilog HDL Case Statement warning at Unidade_Controle.v(162): incomplete case statement has no default case item File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/Unidade_Controle.v Line: 162
 Warning (10270): Verilog HDL Case Statement warning at Unidade_Controle.v(47): incomplete case statement has no default case item File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/Unidade_Controle.v Line: 47
-Info (12128): Elaborating entity "ControleSinal" for hierarchy "ControleSinal:io_signal_control" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 130
-Info (12128): Elaborating entity "banco" for hierarchy "banco:banco_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 142
-Info (12128): Elaborating entity "mux_ula" for hierarchy "mux_ula:mux_ula_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 146
-Info (12128): Elaborating entity "ula" for hierarchy "ula:ula_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 151
-Info (12128): Elaborating entity "ram" for hierarchy "ram:ram_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 179
-Info (12128): Elaborating entity "mux_memoria" for hierarchy "mux_memoria:mux_mem_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 188
-Info (12128): Elaborating entity "mux_jump" for hierarchy "mux_jump:mux_jump_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 192
-Info (12128): Elaborating entity "mux_pc" for hierarchy "mux_pc:mux_pc_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 201
-Info (12128): Elaborating entity "ControleSaida" for hierarchy "ControleSaida:display_controller" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 227
+Info (12128): Elaborating entity "ControleSinal" for hierarchy "ControleSinal:io_signal_control" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 132
+Info (12128): Elaborating entity "banco" for hierarchy "banco:banco_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 151
+Info (12128): Elaborating entity "mux_ula" for hierarchy "mux_ula:mux_ula_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 155
+Info (12128): Elaborating entity "ula" for hierarchy "ula:ula_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 160
+Info (12128): Elaborating entity "ram" for hierarchy "ram:ram_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 188
+Info (12128): Elaborating entity "mux_memoria" for hierarchy "mux_memoria:mux_mem_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 197
+Info (12128): Elaborating entity "mux_jump" for hierarchy "mux_jump:mux_jump_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 201
+Info (12128): Elaborating entity "mux_pc" for hierarchy "mux_pc:mux_pc_inst" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 210
+Info (12128): Elaborating entity "ControleSaida" for hierarchy "ControleSaida:display_controller" File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/cpu.v Line: 236
 Warning (10230): Verilog HDL assignment warning at ControleSaida.v(33): truncated value with size 32 to match size of target (4) File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/ControleSaida.v Line: 33
 Warning (10230): Verilog HDL assignment warning at ControleSaida.v(34): truncated value with size 32 to match size of target (4) File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/ControleSaida.v Line: 34
 Warning (10230): Verilog HDL assignment warning at ControleSaida.v(35): truncated value with size 32 to match size of target (4) File: C:/Users/felip/Documents/GitHub/Compiladores/src/processor/cpu_gcd/cpu/ControleSaida.v Line: 35
@@ -3868,10 +3869,10 @@ Info (21057): Implemented 12660 device resources after synthesis - the final res
     Info (21061): Implemented 12568 logic cells
     Info (21062): Implemented 6 DSP elements
 Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 26 warnings
-    Info: Peak virtual memory: 4918 megabytes
-    Info: Processing ended: Thu Jun 25 12:56:15 2026
-    Info: Elapsed time: 00:00:29
-    Info: Total CPU time (on all processors): 00:00:34
+    Info: Peak virtual memory: 4980 megabytes
+    Info: Processing ended: Wed Jul  1 18:37:55 2026
+    Info: Elapsed time: 00:00:44
+    Info: Total CPU time (on all processors): 00:00:35
 
 
 +------------------------------------------+

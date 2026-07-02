@@ -8,7 +8,8 @@ Projeto integrado de compilador C- e processador custom em Verilog para FPGA.
 - `src/processor/cpu/`: RTL do processador, projeto Quartus e `programa.txt` carregado pela ROM.
 - `tools/`: simulador e utilitarios de apoio.
 - `tests/`: programas C- usados em testes.
-- `entregavel_final/`: fontes e saidas finais geradas para `fact`, `gcd` e `sort`.
+- `entregavel_final/`: compilador final e saidas finais geradas.
+- `entregavel_final/codigos/`: versao organizada dos programas `fact`, `gcd` e `sort`, com fonte original, quadruplas, assembly e binario de ROM.
 - `old/`: arquivos arquivados, backups, artefatos gerados e entregas antigas.
 
 ## Compilador
@@ -46,7 +47,7 @@ python tools/interactive_sim.py src/processor/cpu/programa.txt --inputs 9,2,7,1,
 Para ver sinais do datapath:
 
 ```bash
-python tools/interactive_sim.py entregavel_final/gcd_programa.txt --inputs 48,18 --expect 6 --trace --trace-limit 30
+python tools/interactive_sim.py entregavel_final/codigos/gcd/programa.txt --inputs 48,18 --expect 6 --trace --trace-limit 30
 ```
 
 ## FPGA / Quartus
@@ -60,6 +61,8 @@ src/processor/cpu/cpu.qpf
 O top-level e `cpu`. A ROM le `programa.txt` no diretorio do projeto Quartus.
 
 Antes de programar a FPGA, recompile no Quartus para regenerar `db/`, `incremental_db/` e `output_files/`.
+
+Na placa fisica, `KEY0` confirma cada `IN` e tambem avanca cada `OUT`. Durante `OUT`, o PC fica parado mantendo o valor no display ate o proximo clique.
 
 ## Enderecamento
 

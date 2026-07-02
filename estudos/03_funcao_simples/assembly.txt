@@ -1,0 +1,27 @@
+JUMP main
+inc:
+LOAD_STACK $at
+STORE $at, n, 0
+STORE_STACK $ra
+LOAD $t0, n
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+LOAD_STACK $ra
+STORE_STACK $t2
+JR $ra
+LOAD_STACK $ra
+JR $ra
+main:
+STORE_STACK $ra
+LOAD $at, x, 0
+STORE_STACK $at
+ADDI $t0, $zero, 4
+STORE_STACK $t0
+JAL $ra, inc
+LOAD_STACK $t0
+LOAD_STACK $at
+STORE $at, x, 0
+STORE -, $t0, x
+LOAD $t0, x
+OUT $t0
+HALT -

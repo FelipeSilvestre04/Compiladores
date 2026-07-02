@@ -1,0 +1,23 @@
+int soma(int v[], int i)
+{
+    int r;
+
+    r = v[i] + 1;
+    return r;
+}
+
+void main(void)
+{
+    int a[2];
+    int x;
+
+    a[0] = 4;
+    a[1] = 5;
+
+    x = soma(a, 1);
+
+    if (x > 5)
+        output(x);
+    else
+        output(a[0]);
+}

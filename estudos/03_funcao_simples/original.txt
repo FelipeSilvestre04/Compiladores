@@ -1,0 +1,12 @@
+int inc(int n)
+{
+    return n + 1;
+}
+
+void main(void)
+{
+    int x;
+
+    x = inc(4);
+    output(x);
+}

@@ -1,0 +1,11 @@
+void main(void)
+{
+    int x;
+
+    x = 3;
+
+    if (x > 5)
+        output(x);
+    else
+        output(0);
+}

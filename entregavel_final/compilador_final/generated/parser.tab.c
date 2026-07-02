@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 1 "parser.y"
+#line 1 "src/parser.y"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -87,7 +87,7 @@ int syntax_error_count = 0;  // Contador de erros sintaticos
 void iniciar_compilador(Node* raiz);
 void semantic_analysis(Node* root);
 
-#line 91 "parser.tab.c"
+#line 91 "generated/parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -1203,16 +1203,16 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* programa: declaracao_lista  */
-#line 57 "parser.y"
+#line 57 "src/parser.y"
                      { 
         (yyval.nptr) = create_node(NODE_PROGRAMA, (yyvsp[0].nptr), NULL, NULL); 
         ast_root = (yyval.nptr);
     }
-#line 1212 "parser.tab.c"
+#line 1212 "generated/parser.tab.c"
     break;
 
   case 3: /* declaracao_lista: declaracao_lista declaracao  */
-#line 64 "parser.y"
+#line 64 "src/parser.y"
                                 {
         Node* head = (yyvsp[-1].nptr);
         if (head) {
@@ -1223,126 +1223,126 @@ yyreduce:
             (yyval.nptr) = (yyvsp[0].nptr);
         }
     }
-#line 1227 "parser.tab.c"
+#line 1227 "generated/parser.tab.c"
     break;
 
   case 4: /* declaracao_lista: declaracao  */
-#line 74 "parser.y"
+#line 74 "src/parser.y"
                  { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1233 "parser.tab.c"
+#line 1233 "generated/parser.tab.c"
     break;
 
   case 5: /* declaracao: var_declaracao  */
-#line 78 "parser.y"
+#line 78 "src/parser.y"
                    { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1239 "parser.tab.c"
+#line 1239 "generated/parser.tab.c"
     break;
 
   case 6: /* declaracao: fun_declaracao  */
-#line 79 "parser.y"
+#line 79 "src/parser.y"
                      { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1245 "parser.tab.c"
+#line 1245 "generated/parser.tab.c"
     break;
 
   case 7: /* declaracao: error PEV  */
-#line 80 "parser.y"
+#line 80 "src/parser.y"
                 { yyerrok; (yyval.nptr) = NULL; }
-#line 1251 "parser.tab.c"
+#line 1251 "generated/parser.tab.c"
     break;
 
   case 8: /* var_declaracao: tipo_especificador ID PEV  */
-#line 84 "parser.y"
+#line 84 "src/parser.y"
                               { 
         (yyval.nptr) = create_node(NODE_VAR_DECLARACAO, (yyvsp[-2].nptr), create_leaf_id(NODE_ID, (yyvsp[-1].sval)), NULL); 
     }
-#line 1259 "parser.tab.c"
+#line 1259 "generated/parser.tab.c"
     break;
 
   case 9: /* var_declaracao: tipo_especificador ID ACO NUM FCO PEV  */
-#line 87 "parser.y"
+#line 87 "src/parser.y"
                                             { 
         (yyval.nptr) = create_node(NODE_VAR_DECLARACAO_ARRAY, (yyvsp[-5].nptr), create_leaf_id(NODE_ID, (yyvsp[-4].sval)), create_leaf_val(NODE_NUM, (yyvsp[-2].ival))); 
     }
-#line 1267 "parser.tab.c"
+#line 1267 "generated/parser.tab.c"
     break;
 
   case 10: /* tipo_especificador: INT  */
-#line 93 "parser.y"
+#line 93 "src/parser.y"
         { (yyval.nptr) = create_node(NODE_TIPO_INT, NULL, NULL, NULL); }
-#line 1273 "parser.tab.c"
+#line 1273 "generated/parser.tab.c"
     break;
 
   case 11: /* tipo_especificador: VOI  */
-#line 94 "parser.y"
+#line 94 "src/parser.y"
           { (yyval.nptr) = create_node(NODE_TIPO_VOID, NULL, NULL, NULL); }
-#line 1279 "parser.tab.c"
+#line 1279 "generated/parser.tab.c"
     break;
 
   case 12: /* fun_declaracao: tipo_especificador ID APR params FPR composto_decl  */
-#line 98 "parser.y"
+#line 98 "src/parser.y"
                                                        {
         Node* id_node = create_leaf_id(NODE_ID, (yyvsp[-4].sval));
         id_node->child1 = (yyvsp[-2].nptr);
         (yyval.nptr) = create_node(NODE_FUN_DECLARACAO, (yyvsp[-5].nptr), id_node, (yyvsp[0].nptr));
     }
-#line 1289 "parser.tab.c"
+#line 1289 "generated/parser.tab.c"
     break;
 
   case 13: /* params: param_lista  */
-#line 106 "parser.y"
+#line 106 "src/parser.y"
                 { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1295 "parser.tab.c"
+#line 1295 "generated/parser.tab.c"
     break;
 
   case 14: /* params: VOI  */
-#line 107 "parser.y"
+#line 107 "src/parser.y"
           { (yyval.nptr) = create_node(NODE_TIPO_VOID, NULL, NULL, NULL); }
-#line 1301 "parser.tab.c"
+#line 1301 "generated/parser.tab.c"
     break;
 
   case 15: /* param_lista: param_lista VIR param  */
-#line 111 "parser.y"
+#line 111 "src/parser.y"
                           {
         Node* head = (yyvsp[-2].nptr);
         while (head->sibling) head = head->sibling;
         head->sibling = (yyvsp[0].nptr);
         (yyval.nptr) = (yyvsp[-2].nptr);
     }
-#line 1312 "parser.tab.c"
+#line 1312 "generated/parser.tab.c"
     break;
 
   case 16: /* param_lista: param  */
-#line 117 "parser.y"
+#line 117 "src/parser.y"
             { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1318 "parser.tab.c"
+#line 1318 "generated/parser.tab.c"
     break;
 
   case 17: /* param: tipo_especificador ID  */
-#line 121 "parser.y"
+#line 121 "src/parser.y"
                           { 
         (yyval.nptr) = create_node(NODE_PARAM, (yyvsp[-1].nptr), create_leaf_id(NODE_ID, (yyvsp[0].sval)), NULL); 
     }
-#line 1326 "parser.tab.c"
+#line 1326 "generated/parser.tab.c"
     break;
 
   case 18: /* param: tipo_especificador ID ACO FCO  */
-#line 124 "parser.y"
+#line 124 "src/parser.y"
                                     { 
         (yyval.nptr) = create_node(NODE_PARAM_ARRAY, (yyvsp[-3].nptr), create_leaf_id(NODE_ID, (yyvsp[-2].sval)), NULL); 
     }
-#line 1334 "parser.tab.c"
+#line 1334 "generated/parser.tab.c"
     break;
 
   case 19: /* composto_decl: ACH local_declaracoes statement_lista FCH  */
-#line 130 "parser.y"
+#line 130 "src/parser.y"
                                               { 
         (yyval.nptr) = create_node(NODE_COMPOSTO_DECL, (yyvsp[-2].nptr), (yyvsp[-1].nptr), NULL); 
     }
-#line 1342 "parser.tab.c"
+#line 1342 "generated/parser.tab.c"
     break;
 
   case 20: /* local_declaracoes: local_declaracoes var_declaracao  */
-#line 136 "parser.y"
+#line 136 "src/parser.y"
                                      {
         Node* head = (yyvsp[-1].nptr);
         if (head) {
@@ -1353,17 +1353,17 @@ yyreduce:
             (yyval.nptr) = (yyvsp[0].nptr);
         }
     }
-#line 1357 "parser.tab.c"
+#line 1357 "generated/parser.tab.c"
     break;
 
   case 21: /* local_declaracoes: %empty  */
-#line 146 "parser.y"
+#line 146 "src/parser.y"
       { (yyval.nptr) = NULL; }
-#line 1363 "parser.tab.c"
+#line 1363 "generated/parser.tab.c"
     break;
 
   case 22: /* statement_lista: statement_lista statement  */
-#line 150 "parser.y"
+#line 150 "src/parser.y"
                               {
         Node* head = (yyvsp[-1].nptr);
         if (head) {
@@ -1374,296 +1374,296 @@ yyreduce:
             (yyval.nptr) = (yyvsp[0].nptr);
         }
     }
-#line 1378 "parser.tab.c"
+#line 1378 "generated/parser.tab.c"
     break;
 
   case 23: /* statement_lista: %empty  */
-#line 160 "parser.y"
+#line 160 "src/parser.y"
       { (yyval.nptr) = NULL; }
-#line 1384 "parser.tab.c"
+#line 1384 "generated/parser.tab.c"
     break;
 
   case 24: /* statement: expressao_decl  */
-#line 164 "parser.y"
+#line 164 "src/parser.y"
                    { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1390 "parser.tab.c"
+#line 1390 "generated/parser.tab.c"
     break;
 
   case 25: /* statement: composto_decl  */
-#line 165 "parser.y"
+#line 165 "src/parser.y"
                     { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1396 "parser.tab.c"
+#line 1396 "generated/parser.tab.c"
     break;
 
   case 26: /* statement: selecao_decl  */
-#line 166 "parser.y"
+#line 166 "src/parser.y"
                    { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1402 "parser.tab.c"
+#line 1402 "generated/parser.tab.c"
     break;
 
   case 27: /* statement: iteracao_decl  */
-#line 167 "parser.y"
+#line 167 "src/parser.y"
                     { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1408 "parser.tab.c"
+#line 1408 "generated/parser.tab.c"
     break;
 
   case 28: /* statement: retorno_decl  */
-#line 168 "parser.y"
+#line 168 "src/parser.y"
                    { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1414 "parser.tab.c"
+#line 1414 "generated/parser.tab.c"
     break;
 
   case 29: /* statement: error PEV  */
-#line 169 "parser.y"
+#line 169 "src/parser.y"
                 { yyerrok; (yyval.nptr) = NULL; }
-#line 1420 "parser.tab.c"
+#line 1420 "generated/parser.tab.c"
     break;
 
   case 30: /* expressao_decl: expressao PEV  */
-#line 173 "parser.y"
+#line 173 "src/parser.y"
                   { (yyval.nptr) = (yyvsp[-1].nptr); }
-#line 1426 "parser.tab.c"
+#line 1426 "generated/parser.tab.c"
     break;
 
   case 31: /* expressao_decl: PEV  */
-#line 174 "parser.y"
+#line 174 "src/parser.y"
           { (yyval.nptr) = NULL; }
-#line 1432 "parser.tab.c"
+#line 1432 "generated/parser.tab.c"
     break;
 
   case 32: /* selecao_decl: IF APR expressao FPR statement  */
-#line 178 "parser.y"
+#line 178 "src/parser.y"
                                                          { 
         (yyval.nptr) = create_node(NODE_SELECAO_DECL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL); 
     }
-#line 1440 "parser.tab.c"
+#line 1440 "generated/parser.tab.c"
     break;
 
   case 33: /* selecao_decl: IF APR expressao FPR statement ELSE statement  */
-#line 181 "parser.y"
+#line 181 "src/parser.y"
                                                     { 
         (yyval.nptr) = create_node(NODE_SELECAO_DECL, (yyvsp[-4].nptr), (yyvsp[-2].nptr), (yyvsp[0].nptr)); 
     }
-#line 1448 "parser.tab.c"
+#line 1448 "generated/parser.tab.c"
     break;
 
   case 34: /* iteracao_decl: WHI APR expressao FPR statement  */
-#line 187 "parser.y"
+#line 187 "src/parser.y"
                                     { 
         (yyval.nptr) = create_node(NODE_ITERACAO_DECL, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL); 
     }
-#line 1456 "parser.tab.c"
+#line 1456 "generated/parser.tab.c"
     break;
 
   case 35: /* retorno_decl: RET PEV  */
-#line 193 "parser.y"
+#line 193 "src/parser.y"
             { 
         (yyval.nptr) = create_node(NODE_RETORNO_DECL, NULL, NULL, NULL); 
     }
-#line 1464 "parser.tab.c"
+#line 1464 "generated/parser.tab.c"
     break;
 
   case 36: /* retorno_decl: RET expressao PEV  */
-#line 196 "parser.y"
+#line 196 "src/parser.y"
                         { 
         (yyval.nptr) = create_node(NODE_RETORNO_DECL, (yyvsp[-1].nptr), NULL, NULL); 
     }
-#line 1472 "parser.tab.c"
+#line 1472 "generated/parser.tab.c"
     break;
 
   case 37: /* expressao: var REC expressao  */
-#line 202 "parser.y"
+#line 202 "src/parser.y"
                       { 
         (yyval.nptr) = create_node(NODE_EXPRESSAO_REC, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL); 
     }
-#line 1480 "parser.tab.c"
+#line 1480 "generated/parser.tab.c"
     break;
 
   case 38: /* expressao: simples_expressao  */
-#line 205 "parser.y"
+#line 205 "src/parser.y"
                         { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1486 "parser.tab.c"
+#line 1486 "generated/parser.tab.c"
     break;
 
   case 39: /* var: ID  */
-#line 209 "parser.y"
+#line 209 "src/parser.y"
        { (yyval.nptr) = create_leaf_id(NODE_ID, (yyvsp[0].sval)); }
-#line 1492 "parser.tab.c"
+#line 1492 "generated/parser.tab.c"
     break;
 
   case 40: /* var: ID ACO expressao FCO  */
-#line 210 "parser.y"
+#line 210 "src/parser.y"
                            { 
         (yyval.nptr) = create_node(NODE_VAR_ARRAY, create_leaf_id(NODE_ID, (yyvsp[-3].sval)), (yyvsp[-1].nptr), NULL); 
     }
-#line 1500 "parser.tab.c"
+#line 1500 "generated/parser.tab.c"
     break;
 
   case 41: /* simples_expressao: soma_expressao relacional soma_expressao  */
-#line 216 "parser.y"
+#line 216 "src/parser.y"
                                              { 
         (yyval.nptr) = create_node(NODE_RELACIONAL, (yyvsp[-2].nptr), (yyvsp[0].nptr), (yyvsp[-1].nptr)); 
     }
-#line 1508 "parser.tab.c"
+#line 1508 "generated/parser.tab.c"
     break;
 
   case 42: /* simples_expressao: soma_expressao  */
-#line 219 "parser.y"
+#line 219 "src/parser.y"
                      { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1514 "parser.tab.c"
+#line 1514 "generated/parser.tab.c"
     break;
 
   case 43: /* relacional: LEQUAL  */
-#line 223 "parser.y"
+#line 223 "src/parser.y"
            { (yyval.nptr) = create_node(NODE_REL_LEQUAL, NULL, NULL, NULL); }
-#line 1520 "parser.tab.c"
+#line 1520 "generated/parser.tab.c"
     break;
 
   case 44: /* relacional: MENOR  */
-#line 224 "parser.y"
+#line 224 "src/parser.y"
             { (yyval.nptr) = create_node(NODE_REL_MENOR, NULL, NULL, NULL); }
-#line 1526 "parser.tab.c"
+#line 1526 "generated/parser.tab.c"
     break;
 
   case 45: /* relacional: HIGHER  */
-#line 225 "parser.y"
+#line 225 "src/parser.y"
              { (yyval.nptr) = create_node(NODE_REL_HIGHER, NULL, NULL, NULL); }
-#line 1532 "parser.tab.c"
+#line 1532 "generated/parser.tab.c"
     break;
 
   case 46: /* relacional: HEQUAL  */
-#line 226 "parser.y"
+#line 226 "src/parser.y"
              { (yyval.nptr) = create_node(NODE_REL_HEQUAL, NULL, NULL, NULL); }
-#line 1538 "parser.tab.c"
+#line 1538 "generated/parser.tab.c"
     break;
 
   case 47: /* relacional: IGL  */
-#line 227 "parser.y"
+#line 227 "src/parser.y"
           { (yyval.nptr) = create_node(NODE_REL_IGL, NULL, NULL, NULL); }
-#line 1544 "parser.tab.c"
+#line 1544 "generated/parser.tab.c"
     break;
 
   case 48: /* relacional: DIF  */
-#line 228 "parser.y"
+#line 228 "src/parser.y"
           { (yyval.nptr) = create_node(NODE_REL_DIF, NULL, NULL, NULL); }
-#line 1550 "parser.tab.c"
+#line 1550 "generated/parser.tab.c"
     break;
 
   case 49: /* soma_expressao: soma_expressao soma termo  */
-#line 232 "parser.y"
+#line 232 "src/parser.y"
                               { 
         (yyval.nptr) = create_node((yyvsp[-1].nptr)->type, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL); 
     }
-#line 1558 "parser.tab.c"
+#line 1558 "generated/parser.tab.c"
     break;
 
   case 50: /* soma_expressao: termo  */
-#line 235 "parser.y"
+#line 235 "src/parser.y"
             { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1564 "parser.tab.c"
+#line 1564 "generated/parser.tab.c"
     break;
 
   case 51: /* soma: SOM  */
-#line 239 "parser.y"
+#line 239 "src/parser.y"
         { (yyval.nptr) = create_node(NODE_SOMA, NULL, NULL, NULL); }
-#line 1570 "parser.tab.c"
+#line 1570 "generated/parser.tab.c"
     break;
 
   case 52: /* soma: SUB  */
-#line 240 "parser.y"
+#line 240 "src/parser.y"
           { (yyval.nptr) = create_node(NODE_SUB, NULL, NULL, NULL); }
-#line 1576 "parser.tab.c"
+#line 1576 "generated/parser.tab.c"
     break;
 
   case 53: /* termo: termo mult fator  */
-#line 244 "parser.y"
+#line 244 "src/parser.y"
                      { 
         (yyval.nptr) = create_node((yyvsp[-1].nptr)->type, (yyvsp[-2].nptr), (yyvsp[0].nptr), NULL); 
     }
-#line 1584 "parser.tab.c"
+#line 1584 "generated/parser.tab.c"
     break;
 
   case 54: /* termo: fator  */
-#line 247 "parser.y"
+#line 247 "src/parser.y"
             { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1590 "parser.tab.c"
+#line 1590 "generated/parser.tab.c"
     break;
 
   case 55: /* mult: MUL  */
-#line 251 "parser.y"
+#line 251 "src/parser.y"
         { (yyval.nptr) = create_node(NODE_MULT, NULL, NULL, NULL); }
-#line 1596 "parser.tab.c"
+#line 1596 "generated/parser.tab.c"
     break;
 
   case 56: /* mult: DIV  */
-#line 252 "parser.y"
+#line 252 "src/parser.y"
           { (yyval.nptr) = create_node(NODE_DIV, NULL, NULL, NULL); }
-#line 1602 "parser.tab.c"
+#line 1602 "generated/parser.tab.c"
     break;
 
   case 57: /* fator: APR expressao FPR  */
-#line 256 "parser.y"
+#line 256 "src/parser.y"
                       { (yyval.nptr) = (yyvsp[-1].nptr); }
-#line 1608 "parser.tab.c"
+#line 1608 "generated/parser.tab.c"
     break;
 
   case 58: /* fator: var  */
-#line 257 "parser.y"
+#line 257 "src/parser.y"
           { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1614 "parser.tab.c"
+#line 1614 "generated/parser.tab.c"
     break;
 
   case 59: /* fator: ativacao  */
-#line 258 "parser.y"
+#line 258 "src/parser.y"
                { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1620 "parser.tab.c"
+#line 1620 "generated/parser.tab.c"
     break;
 
   case 60: /* fator: NUM  */
-#line 259 "parser.y"
+#line 259 "src/parser.y"
           { (yyval.nptr) = create_leaf_val(NODE_NUM, (yyvsp[0].ival)); }
-#line 1626 "parser.tab.c"
+#line 1626 "generated/parser.tab.c"
     break;
 
   case 61: /* ativacao: ID APR args FPR  */
-#line 263 "parser.y"
+#line 263 "src/parser.y"
                     { 
         (yyval.nptr) = create_node(NODE_ATIVACAO, create_leaf_id(NODE_ID, (yyvsp[-3].sval)), (yyvsp[-1].nptr), NULL); 
     }
-#line 1634 "parser.tab.c"
+#line 1634 "generated/parser.tab.c"
     break;
 
   case 62: /* args: arg_lista  */
-#line 269 "parser.y"
+#line 269 "src/parser.y"
               { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1640 "parser.tab.c"
+#line 1640 "generated/parser.tab.c"
     break;
 
   case 63: /* args: %empty  */
-#line 270 "parser.y"
+#line 270 "src/parser.y"
       { (yyval.nptr) = NULL; }
-#line 1646 "parser.tab.c"
+#line 1646 "generated/parser.tab.c"
     break;
 
   case 64: /* arg_lista: arg_lista VIR expressao  */
-#line 274 "parser.y"
+#line 274 "src/parser.y"
                             {
         Node* head = (yyvsp[-2].nptr);
         while (head->sibling) head = head->sibling;
         head->sibling = (yyvsp[0].nptr);
         (yyval.nptr) = (yyvsp[-2].nptr);
     }
-#line 1657 "parser.tab.c"
+#line 1657 "generated/parser.tab.c"
     break;
 
   case 65: /* arg_lista: expressao  */
-#line 280 "parser.y"
+#line 280 "src/parser.y"
                 { (yyval.nptr) = (yyvsp[0].nptr); }
-#line 1663 "parser.tab.c"
+#line 1663 "generated/parser.tab.c"
     break;
 
 
-#line 1667 "parser.tab.c"
+#line 1667 "generated/parser.tab.c"
 
       default: break;
     }
@@ -1856,7 +1856,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 282 "parser.y"
+#line 282 "src/parser.y"
 
 
 Node* create_node(NodeType type, Node* c1, Node* c2, Node* c3) {

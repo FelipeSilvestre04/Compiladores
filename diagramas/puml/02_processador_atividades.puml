@@ -25,19 +25,19 @@ repeat
       :Atualizar PC para PC + 1;
     else (nao)
       if (Tipo I?) then (sim)
-        :Executar acesso a memoria\nou operacao com imediato;
+        :Executar acesso a memoria,\noperacao com imediato, LA ou MOV;
         :Atualizar registrador ou RAM;
         :Atualizar PC para PC + 1;
       else (nao)
         if (Tipo B?) then (sim)
           :Comparar rs1 e rs2;
-          :Atualizar PC conforme condicao;
+          :Atualizar PC conforme resultado\nda comparacao;
         else (nao)
           if (Tipo J?) then (sim)
-            :Executar salto, retorno\nou chamada com link;
+            :Executar salto relativo,\nsalto absoluto, retorno ou JAL;
             :Atualizar PC com destino;
           else (IO ou NOP)
-            :Executar entrada, saida,\npilha ou nenhuma operacao;
+            :Executar NOP, entrada, saida\nou operacao de pilha;
             :Atualizar PC para PC + 1;
           endif
         endif

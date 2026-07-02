@@ -1,0 +1,14 @@
+JUMP main
+main:
+STORE_STACK $ra
+ADDI $t0, $zero, 5
+STORE -, $t0, x
+ADDI $t0, $zero, 7
+ADDI $t1, $zero, 1
+STORE $t1, $t0, a
+LOAD $t0, x
+OUT $t0
+ADDI $t0, $zero, 1
+LOAD $t1, a, $t0
+OUT $t1
+HALT -

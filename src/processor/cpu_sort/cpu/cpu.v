@@ -61,8 +61,10 @@ module cpu (
     // --- Sinais para Lógica de I/O ---
     wire        IN_signal;         
     wire        WriteToIO;         
-    wire        io_read_strobe;    
-    wire        stall_for_input;   
+    wire        io_read_strobe;
+    wire        io_output_strobe;
+    wire        stall_for_input;
+    wire        stall_for_output;
     wire        effective_halt;    
     wire [17:0] switch_data;       
     wire [31:0] switch_data_extended;
@@ -81,7 +83,7 @@ module cpu (
 
 	 assign led_clock = clk;
 	 assign btn_out = ~btn_in;
-	 assign in_sign_out = IN_signal;
+	 assign in_sign_out = IN_signal | WriteToIO;
 	 
     PC PC_inst (
         .clk(clk),
@@ -129,8 +131,15 @@ module cpu (
         .saida(io_read_strobe)
     );
 
+    ControleSinal out_signal_control (
+        .in(WriteToIO),
+        .btn(btn_in),
+        .saida(io_output_strobe)
+    );
+
     assign stall_for_input = IN_signal & !io_read_strobe;
-    assign effective_halt = Halt | stall_for_input;
+    assign stall_for_output = WriteToIO & !io_output_strobe;
+    assign effective_halt = Halt | stall_for_input | stall_for_output;
 
     assign rs1_real	= (JR == 1'b1) ? rw : rs1;
 
