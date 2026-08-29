@@ -6,17 +6,19 @@ module rom
 	output reg [(DATA_WIDTH-1):0] q
 );
 
+	(* ram_init_file = "programa.mif" *)
 	reg [DATA_WIDTH-1:0] rom[2**ADDR_WIDTH-1:0];
 
 
 	initial
 	begin
+		q = {DATA_WIDTH{1'b0}};
 		$readmemb("programa.txt", rom);
 	end
 
-	always @ (*)
+	always @ (posedge clk)
 	begin
-		q = rom[addr];
+		q <= rom[addr];
 	end
 
 endmodule

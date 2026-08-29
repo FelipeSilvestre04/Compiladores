@@ -1,0 +1,33 @@
+int soma(int valores[], int tamanho)
+{
+    int i;
+    int total;
+    i = 0;
+    total = 0;
+
+    while (i < tamanho)
+    {
+        total = total + valores[i];
+        i = i + 1;
+    }
+
+    return total;
+}
+
+void main(void)
+{
+    int valores[4];
+    int i;
+    int total;
+
+    i = 0;
+    while (i < 4)
+    {
+        valores[i] = input();
+        i = i + 1;
+    }
+
+    total = soma(valores, 4);
+    output(total);
+    output(total / 4);
+}

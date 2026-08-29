@@ -1,0 +1,157 @@
+JUMP main
+minloc:
+LOAD_STACK $at
+STORE $at, a, 0
+LOAD_STACK $at
+STORE $at, low, 0
+LOAD_STACK $at
+STORE $at, high, 0
+STORE_STACK $ra
+LOAD $t0, low
+STORE -, $t0, k
+LOAD $t0, low
+LOAD $t1, a, $t0
+STORE -, $t1, x
+LOAD $t0, low
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+L0:
+LOAD $t0, i
+LOAD $t1, high
+BGE $t0, $t1, L1
+LOAD $t0, i
+LOAD $t1, a, $t0
+LOAD $t0, x
+BGE $t1, $t0, L2
+LOAD $t0, i
+LOAD $t1, a, $t0
+STORE -, $t1, x
+LOAD $t0, i
+STORE -, $t0, k
+JUMP L3
+L2:
+L3:
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L0
+L1:
+LOAD $t0, k
+LOAD_STACK $ra
+STORE_STACK $t0
+JR $ra
+LOAD_STACK $ra
+JR $ra
+sort:
+LOAD_STACK $at
+STORE $at, a, 0
+LOAD_STACK $at
+STORE $at, low, 0
+LOAD_STACK $at
+STORE $at, high, 0
+STORE_STACK $ra
+LOAD $t0, low
+STORE -, $t0, i
+L4:
+LOAD $t0, i
+LOAD $t1, high
+ADDI $t2, $zero, 1
+SUB $t3, $t1, $t2
+BGE $t0, $t3, L5
+LOAD $at, a, 0
+STORE_STACK $at
+LOAD $at, low, 0
+STORE_STACK $at
+LOAD $at, high, 0
+STORE_STACK $at
+LOAD $at, i, 0
+STORE_STACK $at
+LOAD $at, k, 0
+STORE_STACK $at
+LOAD $at, t, 0
+STORE_STACK $at
+LOAD $t0, high
+STORE_STACK $t0
+LOAD $t0, i
+STORE_STACK $t0
+LOAD $t0, a
+STORE_STACK $t0
+JAL $ra, minloc
+LOAD_STACK $t0
+LOAD_STACK $at
+STORE $at, t, 0
+LOAD_STACK $at
+STORE $at, k, 0
+LOAD_STACK $at
+STORE $at, i, 0
+LOAD_STACK $at
+STORE $at, high, 0
+LOAD_STACK $at
+STORE $at, low, 0
+LOAD_STACK $at
+STORE $at, a, 0
+STORE -, $t0, k
+LOAD $t0, k
+LOAD $t1, a, $t0
+STORE -, $t1, t
+LOAD $t0, i
+LOAD $t1, a, $t0
+LOAD $t0, k
+STORE $t0, $t1, a
+LOAD $t0, t
+LOAD $t1, i
+STORE $t1, $t0, a
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L4
+L5:
+LOAD_STACK $ra
+JR $ra
+main:
+STORE_STACK $ra
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+L6:
+LOAD $t0, i
+ADDI $t1, $zero, 10
+BGE $t0, $t1, L7
+IN $t0
+LOAD $t1, i
+STORE $t1, $t0, vet
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L6
+L7:
+LOAD $at, i, 0
+STORE_STACK $at
+ADDI $t0, $zero, 10
+STORE_STACK $t0
+ADDI $t0, $zero, 0
+STORE_STACK $t0
+ADDI $t0, $zero, 0
+STORE_STACK $t0
+JAL $ra, sort
+LOAD_STACK $at
+STORE $at, i, 0
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+L8:
+LOAD $t0, i
+ADDI $t1, $zero, 10
+BGE $t0, $t1, L9
+LOAD $t0, i
+LOAD $t1, vet, $t0
+OUT $t1
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L8
+L9:
+HALT -

@@ -1,0 +1,20 @@
+VALIDACAO NO SIMULADOR
+
+Elemento encontrado
+Entradas do vetor: 4, 9, 2, 7, 5
+Alvo: 7
+Saida esperada: 3
+Saida observada: 3
+Resultado: aprovado
+
+Elemento nao encontrado
+Entradas do vetor: 4, 9, 2, 7, 5
+Alvo: 6
+Saida esperada: 5
+Saida observada: 5
+Observacao: o tamanho do vetor representa ausencia do elemento.
+Resultado: aprovado
+
+VALIDACAO NA FPGA
+
+Estado: pendente

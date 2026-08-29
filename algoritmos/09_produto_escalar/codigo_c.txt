@@ -1,0 +1,38 @@
+int produto(int a[], int b[], int tamanho)
+{
+    int i;
+    int total;
+    i = 0;
+    total = 0;
+
+    while (i < tamanho)
+    {
+        total = total + a[i] * b[i];
+        i = i + 1;
+    }
+
+    return total;
+}
+
+void main(void)
+{
+    int a[3];
+    int b[3];
+    int i;
+
+    i = 0;
+    while (i < 3)
+    {
+        a[i] = input();
+        i = i + 1;
+    }
+
+    i = 0;
+    while (i < 3)
+    {
+        b[i] = input();
+        i = i + 1;
+    }
+
+    output(produto(a, b, 3));
+}

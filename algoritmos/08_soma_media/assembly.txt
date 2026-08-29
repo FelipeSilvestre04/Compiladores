@@ -1,0 +1,71 @@
+JUMP main
+soma:
+LOAD_STACK $at
+STORE $at, valores, 0
+LOAD_STACK $at
+STORE $at, tamanho, 0
+STORE_STACK $ra
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+ADDI $t0, $zero, 0
+STORE -, $t0, total
+L0:
+LOAD $t0, i
+LOAD $t1, tamanho
+BGE $t0, $t1, L1
+LOAD $t0, total
+LOAD $t1, i
+LOAD $t2, valores, $t1
+ADD $t1, $t0, $t2
+STORE -, $t1, total
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L0
+L1:
+LOAD $t0, total
+LOAD_STACK $ra
+STORE_STACK $t0
+JR $ra
+LOAD_STACK $ra
+JR $ra
+main:
+STORE_STACK $ra
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+L2:
+LOAD $t0, i
+ADDI $t1, $zero, 4
+BGE $t0, $t1, L3
+IN $t0
+LOAD $t1, i
+STORE $t1, $t0, valores
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L2
+L3:
+LOAD $at, i, 0
+STORE_STACK $at
+LOAD $at, total, 0
+STORE_STACK $at
+ADDI $t0, $zero, 4
+STORE_STACK $t0
+ADDI $t0, $zero, 4
+STORE_STACK $t0
+JAL $ra, soma
+LOAD_STACK $t0
+LOAD_STACK $at
+STORE $at, total, 0
+LOAD_STACK $at
+STORE $at, i, 0
+STORE -, $t0, total
+LOAD $t0, total
+OUT $t0
+LOAD $t0, total
+ADDI $t1, $zero, 4
+DIV $t2, $t0, $t1
+OUT $t2
+HALT -

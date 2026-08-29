@@ -1,0 +1,81 @@
+JUMP main
+busca:
+LOAD_STACK $at
+STORE $at, valores, 0
+LOAD_STACK $at
+STORE $at, tamanho, 0
+LOAD_STACK $at
+STORE $at, alvo, 0
+STORE_STACK $ra
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+L0:
+LOAD $t0, i
+LOAD $t1, tamanho
+BGE $t0, $t1, L1
+LOAD $t0, i
+LOAD $t1, valores, $t0
+LOAD $t0, alvo
+BNE $t1, $t0, L2
+LOAD $t0, i
+LOAD_STACK $ra
+STORE_STACK $t0
+JR $ra
+JUMP L3
+L2:
+L3:
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L0
+L1:
+LOAD $t0, tamanho
+LOAD_STACK $ra
+STORE_STACK $t0
+JR $ra
+LOAD_STACK $ra
+JR $ra
+main:
+STORE_STACK $ra
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+L4:
+LOAD $t0, i
+ADDI $t1, $zero, 5
+BGE $t0, $t1, L5
+IN $t0
+LOAD $t1, i
+STORE $t1, $t0, valores
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L4
+L5:
+IN $t0
+STORE -, $t0, alvo
+LOAD $at, i, 0
+STORE_STACK $at
+LOAD $at, alvo, 0
+STORE_STACK $at
+LOAD $at, posicao, 0
+STORE_STACK $at
+LOAD $t0, alvo
+STORE_STACK $t0
+ADDI $t0, $zero, 5
+STORE_STACK $t0
+ADDI $t0, $zero, 4
+STORE_STACK $t0
+JAL $ra, busca
+LOAD_STACK $t0
+LOAD_STACK $at
+STORE $at, posicao, 0
+LOAD_STACK $at
+STORE $at, alvo, 0
+LOAD_STACK $at
+STORE $at, i, 0
+STORE -, $t0, posicao
+LOAD $t0, posicao
+OUT $t0
+HALT -

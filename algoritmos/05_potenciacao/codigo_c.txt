@@ -1,0 +1,22 @@
+int potencia(int base, int expoente)
+{
+    int resultado;
+    resultado = 1;
+
+    while (expoente > 0)
+    {
+        resultado = resultado * base;
+        expoente = expoente - 1;
+    }
+
+    return resultado;
+}
+
+void main(void)
+{
+    int base;
+    int expoente;
+    base = input();
+    expoente = input();
+    output(potencia(base, expoente));
+}

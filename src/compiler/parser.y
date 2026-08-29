@@ -16,6 +16,7 @@ int syntax_error_count = 0;  // Contador de erros sintaticos
 
 void iniciar_compilador(Node* raiz);
 void semantic_analysis(Node* root);
+int function_returns_value(const char* name);
 
 %}
 
@@ -496,6 +497,11 @@ Symbol* lookup_function(char* name) {
         s = s->next;
     }
     return NULL;
+}
+
+int function_returns_value(const char* name) {
+    Symbol* function = lookup_function((char*) name);
+    return function != NULL && strcmp(function->type, "void") != 0;
 }
 
 int is_declared_in_scope(char* name, char* scope) {

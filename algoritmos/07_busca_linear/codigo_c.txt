@@ -1,0 +1,33 @@
+int busca(int valores[], int tamanho, int alvo)
+{
+    int i;
+    i = 0;
+
+    while (i < tamanho)
+    {
+        if (valores[i] == alvo)
+            return i;
+        i = i + 1;
+    }
+
+    return tamanho;
+}
+
+void main(void)
+{
+    int valores[5];
+    int i;
+    int alvo;
+    int posicao;
+
+    i = 0;
+    while (i < 5)
+    {
+        valores[i] = input();
+        i = i + 1;
+    }
+
+    alvo = input();
+    posicao = busca(valores, 5, alvo);
+    output(posicao);
+}

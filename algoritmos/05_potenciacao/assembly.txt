@@ -1,0 +1,51 @@
+JUMP main
+potencia:
+LOAD_STACK $at
+STORE $at, base, 0
+LOAD_STACK $at
+STORE $at, expoente, 0
+STORE_STACK $ra
+ADDI $t0, $zero, 1
+STORE -, $t0, resultado
+L0:
+LOAD $t0, expoente
+ADDI $t1, $zero, 0
+BLE $t0, $t1, L1
+LOAD $t0, resultado
+LOAD $t1, base
+MULT $t2, $t0, $t1
+STORE -, $t2, resultado
+LOAD $t0, expoente
+ADDI $t1, $zero, 1
+SUB $t2, $t0, $t1
+STORE -, $t2, expoente
+JUMP L0
+L1:
+LOAD $t0, resultado
+LOAD_STACK $ra
+STORE_STACK $t0
+JR $ra
+LOAD_STACK $ra
+JR $ra
+main:
+STORE_STACK $ra
+IN $t0
+STORE -, $t0, base
+IN $t0
+STORE -, $t0, expoente
+LOAD $at, base, 0
+STORE_STACK $at
+LOAD $at, expoente, 0
+STORE_STACK $at
+LOAD $t0, expoente
+STORE_STACK $t0
+LOAD $t0, base
+STORE_STACK $t0
+JAL $ra, potencia
+LOAD_STACK $t0
+LOAD_STACK $at
+STORE $at, expoente, 0
+LOAD_STACK $at
+STORE $at, base, 0
+OUT $t0
+HALT -

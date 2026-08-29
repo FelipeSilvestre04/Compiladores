@@ -1,0 +1,19 @@
+VALIDACAO NO SIMULADOR
+
+Caso nominal
+Matriz A: 1, 2, 3, 4
+Matriz B: 5, 6, 7, 8
+Saidas esperadas: 19, 22, 43, 50
+Saidas observadas: 19, 22, 43, 50
+Resultado: aprovado
+
+Multiplicacao pela identidade
+Matriz A: 2, 3, 4, 5
+Matriz B: 1, 0, 0, 1
+Saidas esperadas: 2, 3, 4, 5
+Saidas observadas: 2, 3, 4, 5
+Resultado: aprovado
+
+VALIDACAO NA FPGA
+
+Estado: pendente

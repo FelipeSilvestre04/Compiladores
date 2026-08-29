@@ -1,0 +1,83 @@
+JUMP main
+produto:
+LOAD_STACK $at
+STORE $at, a, 0
+LOAD_STACK $at
+STORE $at, b, 0
+LOAD_STACK $at
+STORE $at, tamanho, 0
+STORE_STACK $ra
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+ADDI $t0, $zero, 0
+STORE -, $t0, total
+L0:
+LOAD $t0, i
+LOAD $t1, tamanho
+BGE $t0, $t1, L1
+LOAD $t0, total
+LOAD $t1, i
+LOAD $t2, a, $t1
+LOAD $t1, i
+LOAD $t3, b, $t1
+MULT $t1, $t2, $t3
+ADD $t2, $t0, $t1
+STORE -, $t2, total
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L0
+L1:
+LOAD $t0, total
+LOAD_STACK $ra
+STORE_STACK $t0
+JR $ra
+LOAD_STACK $ra
+JR $ra
+main:
+STORE_STACK $ra
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+L2:
+LOAD $t0, i
+ADDI $t1, $zero, 3
+BGE $t0, $t1, L3
+IN $t0
+LOAD $t1, i
+STORE $t1, $t0, a
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L2
+L3:
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+L4:
+LOAD $t0, i
+ADDI $t1, $zero, 3
+BGE $t0, $t1, L5
+IN $t0
+LOAD $t1, i
+STORE $t1, $t0, b
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L4
+L5:
+LOAD $at, i, 0
+STORE_STACK $at
+ADDI $t0, $zero, 3
+STORE_STACK $t0
+ADDI $t0, $zero, 8
+STORE_STACK $t0
+ADDI $t0, $zero, 5
+STORE_STACK $t0
+JAL $ra, produto
+LOAD_STACK $t0
+LOAD_STACK $at
+STORE $at, i, 0
+OUT $t0
+HALT -

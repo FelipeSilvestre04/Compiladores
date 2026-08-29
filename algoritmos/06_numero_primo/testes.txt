@@ -1,0 +1,23 @@
+VALIDACAO NO SIMULADOR
+
+Numero primo
+Entrada: 29
+Saida esperada: 1
+Saida observada: 1
+Resultado: aprovado
+
+Numero composto
+Entrada: 21
+Saida esperada: 0
+Saida observada: 0
+Resultado: aprovado
+
+Valor menor que dois
+Entrada: 1
+Saida esperada: 0
+Saida observada: 0
+Resultado: aprovado
+
+VALIDACAO NA FPGA
+
+Estado: pendente

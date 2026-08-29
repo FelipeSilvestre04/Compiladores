@@ -1,0 +1,26 @@
+int primo(int n)
+{
+    int divisor;
+    int resto;
+
+    if (n < 2)
+        return 0;
+
+    divisor = 2;
+    while (divisor * divisor <= n)
+    {
+        resto = n - n / divisor * divisor;
+        if (resto == 0)
+            return 0;
+        divisor = divisor + 1;
+    }
+
+    return 1;
+}
+
+void main(void)
+{
+    int n;
+    n = input();
+    output(primo(n));
+}

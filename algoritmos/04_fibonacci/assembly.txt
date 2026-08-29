@@ -1,0 +1,59 @@
+JUMP main
+fibonacci:
+LOAD_STACK $at
+STORE $at, n, 0
+STORE_STACK $ra
+LOAD $t0, n
+ADDI $t1, $zero, 0
+BGT $t0, $t1, L0
+ADDI $t0, $zero, 0
+LOAD_STACK $ra
+STORE_STACK $t0
+JR $ra
+JUMP L1
+L0:
+L1:
+ADDI $t0, $zero, 0
+STORE -, $t0, a
+ADDI $t0, $zero, 1
+STORE -, $t0, b
+ADDI $t0, $zero, 1
+STORE -, $t0, i
+L2:
+LOAD $t0, i
+LOAD $t1, n
+BGE $t0, $t1, L3
+LOAD $t0, a
+LOAD $t1, b
+ADD $t2, $t0, $t1
+STORE -, $t2, proximo
+LOAD $t0, b
+STORE -, $t0, a
+LOAD $t0, proximo
+STORE -, $t0, b
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L2
+L3:
+LOAD $t0, b
+LOAD_STACK $ra
+STORE_STACK $t0
+JR $ra
+LOAD_STACK $ra
+JR $ra
+main:
+STORE_STACK $ra
+IN $t0
+STORE -, $t0, n
+LOAD $at, n, 0
+STORE_STACK $at
+LOAD $t0, n
+STORE_STACK $t0
+JAL $ra, fibonacci
+LOAD_STACK $t0
+LOAD_STACK $at
+STORE $at, n, 0
+OUT $t0
+HALT -

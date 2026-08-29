@@ -1,0 +1,131 @@
+JUMP main
+multiplica:
+LOAD_STACK $at
+STORE $at, a, 0
+LOAD_STACK $at
+STORE $at, b, 0
+LOAD_STACK $at
+STORE $at, c, 0
+STORE_STACK $ra
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+L0:
+LOAD $t0, i
+ADDI $t1, $zero, 2
+BGE $t0, $t1, L1
+ADDI $t0, $zero, 0
+STORE -, $t0, j
+L2:
+LOAD $t0, j
+ADDI $t1, $zero, 2
+BGE $t0, $t1, L3
+ADDI $t0, $zero, 0
+STORE -, $t0, total
+ADDI $t0, $zero, 0
+STORE -, $t0, k
+L4:
+LOAD $t0, k
+ADDI $t1, $zero, 2
+BGE $t0, $t1, L5
+LOAD $t0, total
+LOAD $t1, i
+ADDI $t2, $zero, 2
+MULT $t3, $t1, $t2
+LOAD $t1, k
+ADD $t2, $t3, $t1
+LOAD $t1, a, $t2
+LOAD $t2, k
+ADDI $t3, $zero, 2
+MULT $t4, $t2, $t3
+LOAD $t2, j
+ADD $t3, $t4, $t2
+LOAD $t2, b, $t3
+MULT $t3, $t1, $t2
+ADD $t1, $t0, $t3
+STORE -, $t1, total
+LOAD $t0, k
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, k
+JUMP L4
+L5:
+LOAD $t0, total
+LOAD $t1, i
+ADDI $t2, $zero, 2
+MULT $t3, $t1, $t2
+LOAD $t1, j
+ADD $t2, $t3, $t1
+STORE $t2, $t0, c
+LOAD $t0, j
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, j
+JUMP L2
+L3:
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L0
+L1:
+LOAD_STACK $ra
+JR $ra
+main:
+STORE_STACK $ra
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+L6:
+LOAD $t0, i
+ADDI $t1, $zero, 4
+BGE $t0, $t1, L7
+IN $t0
+LOAD $t1, i
+STORE $t1, $t0, a
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L6
+L7:
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+L8:
+LOAD $t0, i
+ADDI $t1, $zero, 4
+BGE $t0, $t1, L9
+IN $t0
+LOAD $t1, i
+STORE $t1, $t0, b
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L8
+L9:
+LOAD $at, i, 0
+STORE_STACK $at
+ADDI $t0, $zero, 15
+STORE_STACK $t0
+ADDI $t0, $zero, 11
+STORE_STACK $t0
+ADDI $t0, $zero, 7
+STORE_STACK $t0
+JAL $ra, multiplica
+LOAD_STACK $at
+STORE $at, i, 0
+ADDI $t0, $zero, 0
+STORE -, $t0, i
+L10:
+LOAD $t0, i
+ADDI $t1, $zero, 4
+BGE $t0, $t1, L11
+LOAD $t0, i
+LOAD $t1, c, $t0
+OUT $t1
+LOAD $t0, i
+ADDI $t1, $zero, 1
+ADD $t2, $t0, $t1
+STORE -, $t2, i
+JUMP L10
+L11:
+HALT -

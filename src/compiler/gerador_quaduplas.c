@@ -15,6 +15,7 @@ void iniciar_compilador(Node* raiz);
 int check_is_static_array(char* name, char* scope);
 int check_is_array_param(char* name, char* scope);
 int get_var_addr(char* name, char* scope);
+int function_returns_value(const char* name);
 
 char* branch_invertido(int tipo_rel) {
     switch(tipo_rel) {
@@ -80,7 +81,8 @@ char* processa_arvore(Node* node, int* regs_vetor, int* ptr_l, char* escopo) {
 
         case NODE_FUN_DECLARACAO: {
             char* nome = node->child2->sval;
-            salvar_arquivo("FUN", "int", nome, "-");
+            char* tipo = node->child1->type == NODE_TIPO_VOID ? "void" : "int";
+            salvar_arquivo("FUN", tipo, nome, "-");
             Node* p = node->child2->child1;
             while (p != NULL) {
                 if (p->type == NODE_PARAM)
@@ -127,9 +129,13 @@ char* processa_arvore(Node* node, int* regs_vetor, int* ptr_l, char* escopo) {
             salvar_arquivo("SAVE_CONTEXT", escopo, int_to_char(live_count), "-");
             int num_args = 0;
             empilhar_parametros_reverso(node->child2, regs_vetor, ptr_l, escopo, &num_args);
-            char* t = alocar_reg(regs_vetor);
-            salvar_arquivo("CALL", nome, int_to_char(num_args), t);
-            return t;
+            if (function_returns_value(nome)) {
+                char* t = alocar_reg(regs_vetor);
+                salvar_arquivo("CALL", nome, int_to_char(num_args), t);
+                return t;
+            }
+            salvar_arquivo("CALL", nome, int_to_char(num_args), "-");
+            return "-";
         }
 
         case NODE_EXPRESSAO_REC: {
@@ -751,9 +757,11 @@ void salvar_arquivo(char* OP, char* A1, char* A2, char* RES) {
             live_t_stack[live_t_stack_top++] = live_t_count;
         }
         
-        // 1. Salva todas as variáveis locais da função chamadora atual na pilha
+        // 1. Salva escalares e ponteiros de vetores da funcao chamadora.
+        // Vetores locais mantem o mesmo bloco de memoria quando passados por referencia.
         for (int v = 0; v < var_count; v++) {
-            if (strcmp(variables[v].scope, current_function_scope) == 0) {
+            if (strcmp(variables[v].scope, current_function_scope) == 0 &&
+                (!variables[v].is_array || variables[v].is_array_param)) {
                 salvar_asm_line("LOAD", "$at", variables[v].name, "0");
                 salvar_asm_line("STORE_STACK", "$at", "-", "-");
             }
@@ -788,7 +796,8 @@ void salvar_arquivo(char* OP, char* A1, char* A2, char* RES) {
 
         // E. Restaura as variáveis locais na ordem REVERSA
         for (int v = var_count - 1; v >= 0; v--) {
-            if (strcmp(variables[v].scope, current_function_scope) == 0) {
+            if (strcmp(variables[v].scope, current_function_scope) == 0 &&
+                (!variables[v].is_array || variables[v].is_array_param)) {
                 salvar_asm_line("LOAD_STACK", "$at", "-", "-");
                 salvar_asm_line("STORE", "$at", variables[v].name, "0");
             }

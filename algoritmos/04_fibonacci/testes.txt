@@ -1,0 +1,22 @@
+VALIDACAO NO SIMULADOR
+
+Caso nominal
+Entrada: 10
+Saida esperada: 55
+Saida observada: 55
+Resultado: aprovado
+
+Casos base
+Entrada: 0
+Saida esperada: 0
+Saida observada: 0
+Resultado: aprovado
+
+Entrada: 1
+Saida esperada: 1
+Saida observada: 1
+Resultado: aprovado
+
+VALIDACAO NA FPGA
+
+Estado: pendente
